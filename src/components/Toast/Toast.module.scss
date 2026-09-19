@@ -24,8 +24,8 @@
   gap: var(--space-3);
   max-width: 24rem;
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dialog);
   font-size: 0.9rem;
   color: var(--color-text);
 
@@ -35,18 +35,18 @@
 }
 
 .success {
-  background: var(--color-success-bg);
-  color: var(--color-success);
+  background: var(--color-accent-bg);
+  color: var(--color-accent-text);
 }
 
 .error {
-  background: var(--color-error-bg);
-  color: var(--color-error);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text-strong);
 }
 
 .info {
-  background: var(--color-info-bg);
-  color: var(--color-text);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
 }
 
 .message {
