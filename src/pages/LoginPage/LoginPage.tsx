@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import { Button } from "../../components/Button";
+import { TextField } from "../../components/TextField";
 import styles from "./LoginPage.module.scss";
 
 const ERROR_MESSAGES = {
@@ -53,33 +55,26 @@ export function LoginPage() {
           Paste your API token and the organization you want to track time for.
         </p>
 
-        <label className={styles.label} htmlFor="token">
-          API token
-        </label>
-        <input
-          id="token"
-          className={styles.input}
+        <TextField
+          label="API token"
           type="password"
           autoComplete="off"
           value={token}
           onChange={(event) => setToken(event.target.value)}
         />
 
-        <label className={styles.label} htmlFor="organizationId">
-          Organization ID
-        </label>
-        <input
-          id="organizationId"
-          className={styles.inputMono}
+        <TextField
+          label="Organization ID"
+          mono
           type="text"
           autoComplete="off"
           value={organizationId}
           onChange={(event) => setOrganizationId(event.target.value)}
         />
 
-        <button className={styles.submit} type="submit" disabled={!canSubmit}>
+        <Button type="submit" variant="primary" fullWidth disabled={!canSubmit}>
           {isSubmitting ? "Signing in…" : "Continue"}
-        </button>
+        </Button>
 
         <p className={styles.footnote}>
           Credentials stay in your browser. Logging out clears them.

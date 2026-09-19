@@ -13,6 +13,7 @@ export type Session = {
   token: string;
   organizationId: string;
   personId: string;
+  personName?: string;
 };
 
 export type LoginFailureReason =
@@ -43,7 +44,9 @@ function loadStoredSession(): Session | null {
       parsed !== null &&
       typeof (parsed as Session).token === "string" &&
       typeof (parsed as Session).organizationId === "string" &&
-      typeof (parsed as Session).personId === "string"
+      typeof (parsed as Session).personId === "string" &&
+      ((parsed as Session).personName === undefined ||
+        typeof (parsed as Session).personName === "string")
     ) {
       return parsed as Session;
     }
@@ -74,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           token,
           organizationId,
           personId: membership.personId,
+          personName: membership.personName,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newSession));
         setSession(newSession);

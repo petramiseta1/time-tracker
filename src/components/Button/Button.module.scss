@@ -1,0 +1,60 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Dark solid CTA — e.g. the login form's "Continue" submit.
+.primary {
+  padding: var(--space-3);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+// Bordered neutral action — e.g. "Today", "Retry".
+.secondary {
+  border: 1px solid var(--color-border-input);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+// Borderless text action — e.g. "Log out".
+.ghost {
+  background: none;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+
+  &:hover {
+    color: var(--color-text-secondary);
+  }
+}
+
+// Square bordered icon-only action — e.g. prev/next day arrows.
+.icon {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border-input);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.fullWidth {
+  display: flex;
+  width: 100%;
+}

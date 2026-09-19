@@ -1,54 +1,18 @@
-import { type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "./context/ToastContext";
 import { ToastStack } from "./components/Toast";
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { LoginPage } from "./pages/LoginPage";
-import { TimeEntryPage } from "./pages/TimeEntryPage";
+import { AuthProvider } from "./context/AuthContext";
+import { AppRoutes } from "./routers";
 
-const queryClient = new QueryClient();
-
-function RequireAuth({ children }: { children: ReactNode }) {
-  const { session } = useAuth();
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
-  return <>{children}</>;
-}
-
-function RedirectIfAuthed({ children }: { children: ReactNode }) {
-  const { session } = useAuth();
-  if (session) {
-    return <Navigate to="/" replace />;
-  }
-  return <>{children}</>;
-}
-
-// The background/overlay Routes for the entry edit popup (ADR 0004) land
-// in ticket 05.
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <RedirectIfAuthed>
-            <LoginPage />
-          </RedirectIfAuthed>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <RequireAuth>
-            <TimeEntryPage />
-          </RequireAuth>
-        }
-      />
-    </Routes>
-  );
-}
+// No retries: a failed request should surface its error state right away
+// (we always show an explicit Retry action) rather than sit on the loading
+// state through several seconds of automatic exponential-backoff retries.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
 
 export function App() {
   return (

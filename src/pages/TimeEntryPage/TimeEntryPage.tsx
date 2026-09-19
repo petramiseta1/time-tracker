@@ -1,21 +1,134 @@
+import { useMemo } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useWeekTimeEntries } from "../../api/timeEntries";
 import { useAuth } from "../../context/AuthContext";
+import { Avatar } from "../../components/Avatar";
+import { Button } from "../../components/Button";
+import { DateNav } from "../../components/DateNav";
+import { WeekStrip } from "../../components/WeekStrip";
+import { EntryList } from "../../components/EntryList";
+import { EmptyState } from "../../components/EmptyState";
+import { ErrorBanner } from "../../components/ErrorBanner";
+import {
+  fromDateKey,
+  formatShortDate,
+  getWeekDates,
+  isValidDateKey,
+  toDateKey,
+} from "../../utils/date";
+import { DAILY_TARGET_MINUTES, formatHoursDecimal } from "../../utils/duration";
 import styles from "./TimeEntryPage.module.scss";
 
-// Placeholder day view — real entry listing/add/edit/delete land in
-// tickets 03-06.
 export function TimeEntryPage() {
-  const { logout } = useAuth();
+  const { session, logout } = useAuth();
+  const navigate = useNavigate();
+  const { date: dateParam } = useParams<{ date: string }>();
+
+  // Hooks below must run unconditionally even for a bad param (a malformed
+  // `/day/:date` — a typo, garbage, or a leap-day rollover) — the fallback
+  // "today" here is only ever seen for the one render before the redirect
+  // below takes over, so it never actually reaches the page.
+  const isValidParam = isValidDateKey(dateParam);
+  const selectedDate = useMemo(
+    () => (isValidParam ? fromDateKey(dateParam) : new Date()),
+    [isValidParam, dateParam],
+  );
+
+  const handleSelectDate = (date: Date) => {
+    navigate(`/day/${toDateKey(date)}`);
+  };
+
+  const { data, isPending, isError, refetch } = useWeekTimeEntries(
+    session,
+    selectedDate,
+  );
+
+  const weekDates = useMemo(() => getWeekDates(selectedDate), [selectedDate]);
+  const selectedDateKey = toDateKey(selectedDate);
+  const entries = useMemo(() => data ?? [], [data]);
+
+  const totalsByDate = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const entry of entries) {
+      totals.set(entry.date, (totals.get(entry.date) ?? 0) + entry.minutes);
+    }
+    return totals;
+  }, [entries]);
+
+  const dayEntries = useMemo(
+    () => entries.filter((entry) => entry.date === selectedDateKey),
+    [entries, selectedDateKey],
+  );
+  const dayTotalMinutes = totalsByDate.get(selectedDateKey) ?? 0;
+
+  if (!isValidParam) {
+    return <Navigate to={`/day/${toDateKey(new Date())}`} replace />;
+  }
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Productive Time Tracker</h1>
-        <button type="button" className={styles.logoutButton} onClick={logout}>
-          Log out
-        </button>
+        <div className={styles.brand}>
+          <span className={styles.logoMark} />
+          <h1 className={styles.title}>Time Tracker</h1>
+        </div>
+        <DateNav selectedDate={selectedDate} onSelectDate={handleSelectDate} />
+        <div className={styles.headerRight}>
+          {session?.personName && <Avatar name={session.personName} />}
+          <Button variant="ghost" onClick={logout}>
+            Log out
+          </Button>
+        </div>
       </header>
+
       <main className={styles.main}>
-        <p className={styles.placeholder}>Day view coming in ticket 03.</p>
+        <WeekStrip
+          weekDates={weekDates}
+          selectedDate={selectedDate}
+          totalsByDate={totalsByDate}
+          onSelectDate={handleSelectDate}
+        />
+
+        <div className={styles.content}>
+          {isPending && (
+            <div
+              className={styles.skeleton}
+              role="status"
+              aria-label="Loading entries"
+            >
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} className={styles.skeletonRow} />
+              ))}
+            </div>
+          )}
+
+          {!isPending && isError && (
+            <ErrorBanner
+              title="Couldn't load entries"
+              description="Something went wrong loading your time entries. Your data is safe — try again."
+              onRetry={() => refetch()}
+            />
+          )}
+
+          {!isPending && !isError && dayEntries.length === 0 && (
+            <EmptyState
+              title={`Nothing logged on ${formatShortDate(selectedDate)}`}
+              description="Add your first entry for this day."
+            />
+          )}
+
+          {!isPending && !isError && dayEntries.length > 0 && (
+            <>
+              <p className={styles.summary}>
+                {dayEntries.length}{" "}
+                {dayEntries.length === 1 ? "entry" : "entries"} ·{" "}
+                {formatHoursDecimal(dayTotalMinutes)} /{" "}
+                {DAILY_TARGET_MINUTES / 60} h logged
+              </p>
+              <EntryList entries={dayEntries} />
+            </>
+          )}
+        </div>
       </main>
     </div>
   );

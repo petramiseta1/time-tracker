@@ -1,0 +1,92 @@
+.strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.day {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  cursor: pointer;
+  min-height: 52px;
+
+  &.selected {
+    border-color: var(--color-accent);
+    background: var(--color-accent-bg-subtle);
+    box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  top: 0;
+  background: var(--color-progress-track);
+
+  .selected & {
+    background: var(--color-accent-border);
+  }
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+
+  .selected & {
+    color: var(--color-accent-strong);
+  }
+}
+
+.dayNumber {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-faint);
+
+  .selected & {
+    color: var(--color-accent-text);
+  }
+}
+
+.todayDot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  display: block;
+}
+
+.hours {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+
+  .selected & {
+    color: var(--color-accent-text);
+  }
+}
+
+.overTarget {
+  color: var(--color-accent-strong);
+  font-weight: 600;
+}

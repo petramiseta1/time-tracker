@@ -1,0 +1,29 @@
+.container {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-input);
+  border-radius: var(--radius-md);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.icon {
+  display: inline-block;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-bg);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  margin: 0 0 var(--space-2);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.description {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}

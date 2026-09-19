@@ -51,13 +51,5 @@ export async function apiRequest<TResponse>(
     return undefined as TResponse;
   }
 
-  const data = (await response.json()) as TResponse;
-
-  // Temporary debug aid while wiring up the real API — remove once the
-  // org-membership lookup is confirmed working end-to-end.
-  if (import.meta.env.DEV) {
-    console.log(`[apiRequest] ${path}`, data);
-  }
-
-  return data;
+  return (await response.json()) as TResponse;
 }

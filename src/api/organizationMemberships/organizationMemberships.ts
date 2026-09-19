@@ -17,6 +17,7 @@ type OrganizationMembershipResource = {
 type IncludedResource = {
   type: string;
   id: string;
+  attributes?: Record<string, unknown>;
 };
 
 type OrganizationMembershipsResponse = {
@@ -27,7 +28,24 @@ type OrganizationMembershipsResponse = {
 export type ResolvedMembership = {
   organizationId: string;
   personId: string;
+  // Undefined if the API's `people` attributes don't shape up as expected —
+  // the header's avatar is decorative, so we degrade to not showing it
+  // rather than failing login over it. Attribute names (`first_name`/
+  // `last_name`) are the Productive API's documented shape but unconfirmed
+  // against the live test account — worth checking once logged in.
+  personName?: string;
 };
+
+function personNameFromAttributes(
+  attributes: Record<string, unknown> | undefined,
+): string | undefined {
+  const firstName =
+    typeof attributes?.first_name === "string" ? attributes.first_name : "";
+  const lastName =
+    typeof attributes?.last_name === "string" ? attributes.last_name : "";
+  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  return fullName || undefined;
+}
 
 // Looks up the membership for the entered Organization ID via the API's own
 // filter[organization_id], rather than fetching every membership the token
@@ -59,7 +77,17 @@ export async function findMembershipForOrganization(
     membership.relationships.person?.data?.id ??
     response.included?.find((resource) => resource.type === "people")?.id;
 
-  return personId
-    ? { organizationId: credentials.organizationId, personId }
-    : null;
+  if (!personId) {
+    return null;
+  }
+
+  const personResource = response.included?.find(
+    (resource) => resource.type === "people" && resource.id === personId,
+  );
+
+  return {
+    organizationId: credentials.organizationId,
+    personId,
+    personName: personNameFromAttributes(personResource?.attributes),
+  };
 }
