@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { ApiError } from "../../api/client";
 import { useWeekTimeEntries } from "../../api/timeEntries";
 import { useAuth } from "../../context/AuthContext";
 import { Avatar } from "../../components/Avatar";
@@ -38,10 +39,23 @@ export function TimeEntryPage() {
     navigate(`/day/${toDateKey(date)}`);
   };
 
-  const { data, isPending, isError, refetch } = useWeekTimeEntries(
+  const { data, error, isPending, isError, refetch } = useWeekTimeEntries(
     session,
     selectedDate,
   );
+
+  // A 401 means the stored token is no longer valid (expired, revoked, or
+  // tampered with) — the session that RequireAuth let us in with is stale.
+  // Log out so the guard redirects to /login instead of leaving the user
+  // stuck on a page that can never load.
+  const isSessionExpired =
+    isError && error instanceof ApiError && error.status === 401;
+
+  useEffect(() => {
+    if (isSessionExpired) {
+      logout();
+    }
+  }, [isSessionExpired, logout]);
 
   const weekDates = useMemo(() => getWeekDates(selectedDate), [selectedDate]);
   const selectedDateKey = toDateKey(selectedDate);
@@ -102,7 +116,7 @@ export function TimeEntryPage() {
             </div>
           )}
 
-          {!isPending && isError && (
+          {!isPending && isError && !isSessionExpired && (
             <ErrorBanner
               title="Couldn't load entries"
               description="Something went wrong loading your time entries. Your data is safe — try again."
