@@ -1,0 +1,5 @@
+// SCSS variable reserved for the one place CSS custom properties can't
+// reach: `@media` query conditions don't accept `var()`. Every other
+// design token lives in css-variables.scss instead.
+
+$breakpoint-mobile: 480px;
