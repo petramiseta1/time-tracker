@@ -31,6 +31,7 @@ export async function apiRequest<TResponse>(
 ): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method ?? "GET",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/vnd.api+json",
       "X-Auth-Token": credentials.token,
@@ -50,5 +51,13 @@ export async function apiRequest<TResponse>(
     return undefined as TResponse;
   }
 
-  return (await response.json()) as TResponse;
+  const data = (await response.json()) as TResponse;
+
+  // Temporary debug aid while wiring up the real API — remove once the
+  // org-membership lookup is confirmed working end-to-end.
+  if (import.meta.env.DEV) {
+    console.log(`[apiRequest] ${path}`, data);
+  }
+
+  return data;
 }
