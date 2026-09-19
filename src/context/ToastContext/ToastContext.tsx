@@ -55,6 +55,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Context + its hook are colocated deliberately (see docs/tech-stack.md's
+// project structure), so this file exports more than one component-shaped
+// thing — safe to ignore for fast-refresh purposes.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast(): ToastContextValue {
   const context = useContext(ToastContext);
   if (!context) {
