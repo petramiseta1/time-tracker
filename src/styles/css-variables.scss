@@ -46,6 +46,14 @@
   // --color-danger-border used around an error banner/box).
   --color-danger-border-strong: #d87e93;
 
+  // Success (mutation confirmations). Separate hue from the rose accent —
+  // that family is already used for danger, so reusing it for "it worked"
+  // made success toasts read as errors. Fill/border are saturated enough
+  // to read on white/off-white surfaces, with text still clearing WCAG AA.
+  --color-success-text: #246338;
+  --color-success-bg: #d4edd9;
+  --color-success-border: #8fbf98;
+
   // Misc
   --color-progress-track: #f0edea;
 

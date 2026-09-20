@@ -9,7 +9,9 @@
   flex-direction: column;
   align-items: flex-end;
   gap: var(--space-2);
-  z-index: 1000;
+  // Above Modal (1000) so add/edit/delete feedback stays visible while
+  // the dialog is still open.
+  z-index: 1100;
   pointer-events: none;
 
   @media (max-width: $breakpoint-mobile) {
@@ -24,9 +26,16 @@
   gap: var(--space-3);
   max-width: 24rem;
   padding: var(--space-3) var(--space-4);
+  border: 1px solid transparent;
+  border-left-width: 4px;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-dialog);
+  // Tighter than --shadow-dialog so the chip's edge reads on white, not
+  // just a large soft glow that disappears against the page.
+  box-shadow:
+    0 1px 2px rgba(25, 24, 23, 0.08),
+    0 10px 28px -8px rgba(25, 24, 23, 0.28);
   font-size: 0.9rem;
+  font-weight: 500;
   color: var(--color-text);
 
   @media (max-width: $breakpoint-mobile) {
@@ -35,18 +44,24 @@
 }
 
 .success {
-  background: var(--color-accent-bg);
-  color: var(--color-accent-text);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  border-color: var(--color-success-border);
+  border-left-color: var(--color-success-text);
 }
 
 .error {
-  background: var(--color-danger-bg);
+  background: var(--color-danger-border);
   color: var(--color-danger-text-strong);
+  border-color: var(--color-danger-border-strong);
+  border-left-color: var(--color-danger-text-strong);
 }
 
 .info {
-  background: var(--color-surface-muted);
+  background: var(--color-surface);
   color: var(--color-text-secondary);
+  border-color: var(--color-border);
+  border-left-color: var(--color-text-muted);
 }
 
 .message {

@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { useToast } from "../../context/ToastContext";
+import { useAuth, type LoginFailureReason } from "../../context/AuthContext";
 import { Button } from "../../components/Button";
 import { LogoMark } from "../../components/LogoMark";
 import { TextField } from "../../components/TextField";
@@ -15,12 +14,14 @@ const ERROR_MESSAGES = {
 
 export function LoginPage() {
   const { login } = useAuth();
-  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [token, setToken] = useState("");
   const [organizationId, setOrganizationId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorReason, setErrorReason] = useState<LoginFailureReason | null>(
+    null,
+  );
 
   const canSubmit =
     token.trim() !== "" && organizationId.trim() !== "" && !isSubmitting;
@@ -31,6 +32,7 @@ export function LoginPage() {
       return;
     }
 
+    setErrorReason(null);
     setIsSubmitting(true);
     const result = await login(token.trim(), organizationId.trim());
     setIsSubmitting(false);
@@ -40,7 +42,11 @@ export function LoginPage() {
       return;
     }
 
-    showToast(ERROR_MESSAGES[result.reason], "error");
+    // Login failures stay on the form (field-level where we know which
+    // credential is wrong) rather than a toast. A toast would auto-dismiss
+    // away from the fields the user has to fix; ADR 0002's distinct
+    // messages only help if they stay visible next to those fields.
+    setErrorReason(result.reason);
   }
 
   return (
@@ -61,7 +67,15 @@ export function LoginPage() {
           type="password"
           autoComplete="off"
           value={token}
-          onChange={(event) => setToken(event.target.value)}
+          onChange={(event) => {
+            setToken(event.target.value);
+            setErrorReason(null);
+          }}
+          error={
+            errorReason === "invalid-token"
+              ? ERROR_MESSAGES["invalid-token"]
+              : undefined
+          }
         />
 
         <TextField
@@ -70,16 +84,26 @@ export function LoginPage() {
           type="text"
           autoComplete="off"
           value={organizationId}
-          onChange={(event) => setOrganizationId(event.target.value)}
+          onChange={(event) => {
+            setOrganizationId(event.target.value);
+            setErrorReason(null);
+          }}
+          error={
+            errorReason === "no-organization"
+              ? ERROR_MESSAGES["no-organization"]
+              : undefined
+          }
         />
 
-        <Button type="submit" variant="primary" fullWidth disabled={!canSubmit}>
-          {isSubmitting ? "Signing in…" : "Continue"}
-        </Button>
+        {errorReason === "unknown" && (
+          <p className={styles.formError} role="alert">
+            {ERROR_MESSAGES.unknown}
+          </p>
+        )}
 
-        <p className={styles.footnote}>
-          Credentials stay in your browser. Logging out clears them.
-        </p>
+        <Button type="submit" variant="primary" fullWidth disabled={!canSubmit}>
+          {isSubmitting ? "Signing in…" : "Sign in"}
+        </Button>
       </form>
     </div>
   );

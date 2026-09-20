@@ -10,21 +10,29 @@ export function ToastStack() {
   }
 
   return (
-    <div className={styles.stack} role="status" aria-live="polite">
-      {toasts.map((toast) => (
-        <div key={toast.id} className={clsx(styles.toast, styles[toast.type])}>
-          <span className={styles.message}>{toast.message}</span>
-          <button
-            type="button"
-            className={styles.dismiss}
-            aria-label={`Dismiss: ${toast.message}`}
-            title="Dismiss"
-            onClick={() => dismissToast(toast.id)}
+    <div className={styles.stack}>
+      {toasts.map((toast) => {
+        const isError = toast.type === "error";
+        return (
+          <div
+            key={toast.id}
+            className={clsx(styles.toast, styles[toast.type])}
+            role={isError ? "alert" : "status"}
+            aria-live={isError ? "assertive" : "polite"}
           >
-            ×
-          </button>
-        </div>
-      ))}
+            <span className={styles.message}>{toast.message}</span>
+            <button
+              type="button"
+              className={styles.dismiss}
+              aria-label={`Dismiss: ${toast.message}`}
+              title="Dismiss"
+              onClick={() => dismissToast(toast.id)}
+            >
+              ×
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }
