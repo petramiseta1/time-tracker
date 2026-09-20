@@ -1,0 +1,14 @@
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-surface);
+
+  svg {
+    width: 62%;
+    height: 62%;
+  }
+}

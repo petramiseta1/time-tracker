@@ -11,8 +11,12 @@
 }
 
 .day {
-  position: relative;
-  overflow: hidden;
+  // Whether the label/hours share a row or stack depends on this card's
+  // own rendered width, not the viewport's — seven columns can be too
+  // narrow to fit both side by side well before the page itself hits a
+  // "mobile" breakpoint (e.g. a tablet, or a plain narrow window).
+  container-type: inline-size;
+
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -32,26 +36,51 @@
   }
 }
 
-.fill {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  top: 0;
-  background: var(--color-progress-track);
-
-  .selected & {
-    background: var(--color-accent-border);
-  }
-}
-
 .content {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.labelRow {
+.progressTrack {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-progress-track);
+  overflow: hidden;
+
+  .selected & {
+    background: var(--color-accent-bg);
+  }
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+
+  &.progressOverTarget {
+    background: var(--color-accent-strong);
+  }
+}
+
+.topRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+
+  // Side-by-side label + hours don't fit once the card itself is
+  // narrower than this — stack them instead of letting the hours text
+  // spill past the card's edge.
+  @container (max-width: 90px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+.dateGroup {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -73,10 +102,10 @@
   font-size: 0.6875rem;
   color: var(--color-text-faint);
 
-  // Dropped at mobile widths — the weekday label + hours are enough to
-  // read the strip at a glance, and the day-of-month no longer fits
-  // legibly next to them in a ~40px cell.
-  @media (max-width: $breakpoint-mobile) {
+  // Dropped once the card is narrow — the weekday label alone is
+  // enough to read the strip at a glance, and the day-of-month no
+  // longer fits legibly next to it in a cramped cell.
+  @container (max-width: 55px) {
     display: none;
   }
 
@@ -98,7 +127,7 @@
   font-size: 0.8125rem;
   color: var(--color-text);
 
-  @media (max-width: $breakpoint-mobile) {
+  @container (max-width: 50px) {
     font-size: 0.6875rem;
   }
 

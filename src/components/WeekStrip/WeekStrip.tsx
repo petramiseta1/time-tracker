@@ -47,24 +47,32 @@ export function WeekStrip({
                 : "no entries"
             }`}
           >
-            {minutes > 0 && (
-              <span className={styles.fill} style={{ width: `${percent}%` }} />
-            )}
             <span className={styles.content}>
-              <span className={styles.labelRow}>
-                <span className={styles.label}>{formatDayLabel(date)}</span>
-                <span className={styles.dayNumber}>
-                  {formatDayOfMonth(date)}
+              <span className={styles.topRow}>
+                <span className={styles.dateGroup}>
+                  <span className={styles.label}>{formatDayLabel(date)}</span>
+                  <span className={styles.dayNumber}>
+                    {formatDayOfMonth(date)}
+                  </span>
+                  {today && <span className={styles.todayDot} />}
                 </span>
-                {today && <span className={styles.todayDot} />}
+                <span
+                  className={clsx(
+                    styles.hours,
+                    isOverTarget && styles.overTarget,
+                  )}
+                >
+                  {minutes > 0 ? `${formatHoursDecimal(minutes)}h` : "—"}
+                </span>
               </span>
-              <span
-                className={clsx(
-                  styles.hours,
-                  isOverTarget && styles.overTarget,
-                )}
-              >
-                {minutes > 0 ? `${formatHoursDecimal(minutes)}h` : "—"}
+              <span className={styles.progressTrack}>
+                <span
+                  className={clsx(
+                    styles.progressFill,
+                    isOverTarget && styles.progressOverTarget,
+                  )}
+                  style={{ width: `${percent}%` }}
+                />
               </span>
             </span>
           </button>

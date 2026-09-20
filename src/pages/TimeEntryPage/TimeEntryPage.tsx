@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Avatar } from "../../components/Avatar";
 import { Button } from "../../components/Button";
 import { DateNav } from "../../components/DateNav";
+import { LogoMark } from "../../components/LogoMark";
 import { WeekStrip } from "../../components/WeekStrip";
 import { EntryForm } from "../../components/EntryForm";
 import { EntryList } from "../../components/EntryList";
@@ -85,21 +86,23 @@ export function TimeEntryPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <div className={styles.brand}>
-          <span className={styles.logoMark} />
-          <h1 className={styles.title}>Time Tracker</h1>
-        </div>
-        <div className={styles.dateNavWrapper}>
-          <DateNav
-            selectedDate={selectedDate}
-            onSelectDate={handleSelectDate}
-          />
-        </div>
-        <div className={styles.headerRight}>
-          {session?.personName && <Avatar name={session.personName} />}
-          <Button variant="ghost" onClick={logout}>
-            Log out
-          </Button>
+        <div className={styles.headerInner}>
+          <div className={styles.brand}>
+            <LogoMark size={22} />
+            <h1 className={styles.title}>Time Tracker</h1>
+          </div>
+          <div className={styles.dateNavWrapper}>
+            <DateNav
+              selectedDate={selectedDate}
+              onSelectDate={handleSelectDate}
+            />
+          </div>
+          <div className={styles.headerRight}>
+            {session?.personName && <Avatar name={session.personName} />}
+            <Button variant="ghost" onClick={logout}>
+              Log out
+            </Button>
+          </div>
         </div>
       </header>
 

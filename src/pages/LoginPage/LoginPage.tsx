@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { Button } from "../../components/Button";
+import { LogoMark } from "../../components/LogoMark";
 import { TextField } from "../../components/TextField";
 import styles from "./LoginPage.module.scss";
 
@@ -46,7 +47,7 @@ export function LoginPage() {
     <div className={styles.page}>
       <form className={styles.card} onSubmit={handleSubmit}>
         <div className={styles.brand}>
-          <span className={styles.logoMark} />
+          <LogoMark size={26} />
           <span className={styles.brandName}>Time Tracker</span>
         </div>
 
