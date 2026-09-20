@@ -5,7 +5,12 @@ import {
   type QueryClient,
 } from "@tanstack/react-query";
 import type { Session } from "../../context/AuthContext";
-import { getWeekEnd, getWeekStart, toDateKey } from "../../utils/date";
+import {
+  fromDateKey,
+  getWeekEnd,
+  getWeekStart,
+  toDateKey,
+} from "../../utils/date";
 import {
   createTimeEntry,
   deleteTimeEntry,
@@ -79,6 +84,90 @@ function findCachedTimeEntry(
   return undefined;
 }
 
+function getWeekQueryKey(personId: string, date: Date) {
+  return [
+    "timeEntries",
+    "week",
+    personId,
+    toDateKey(getWeekStart(date)),
+  ] as const;
+}
+
+// Writes `entry` straight into whichever cached week list it belongs to
+// (by `entry.date`), instead of invalidating and refetching — see
+// docs/adr/0006-week-strip-in-day-view.md for why weeks are the cache unit.
+// `invalidateQueries` would make the mutation's `onSuccess` await a second
+// network round trip (the refetch) before `mutateAsync` resolves; under a
+// throttled connection that makes a successful edit/delete look stuck for
+// a full extra request after the API already confirmed it. A direct write
+// is synchronous, and we already have the authoritative entry back from
+// the API, so there's nothing the refetch would tell us that we don't
+// already know.
+//
+// Replaces an existing copy in place (so its position in that day's list
+// doesn't jump) or appends if it's new to that week, and strips any stale
+// copy left behind in a *different* week's cache — relevant when an edit
+// moves an entry's date across a week boundary. Only touches weeks that
+// are already cached; an uncached week fetches fresh, correct contents
+// the next time it's visited, so nothing needs to be invalidated there
+// either.
+function writeEntryToWeekCaches(
+  queryClient: QueryClient,
+  personId: string,
+  entry: TimeEntry,
+) {
+  const targetKey = getWeekQueryKey(personId, fromDateKey(entry.date));
+  const cachedWeeks = queryClient.getQueriesData<TimeEntry[]>({
+    queryKey: ["timeEntries", "week", personId],
+  });
+
+  for (const [key, entries] of cachedWeeks) {
+    if (!entries) {
+      continue;
+    }
+
+    const isTargetWeek = key.every((part, index) => part === targetKey[index]);
+
+    if (isTargetWeek) {
+      const hasEntry = entries.some((existing) => existing.id === entry.id);
+      queryClient.setQueryData(
+        key,
+        hasEntry
+          ? entries.map((existing) =>
+              existing.id === entry.id ? entry : existing,
+            )
+          : [...entries, entry],
+      );
+    } else if (entries.some((existing) => existing.id === entry.id)) {
+      queryClient.setQueryData(
+        key,
+        entries.filter((existing) => existing.id !== entry.id),
+      );
+    }
+  }
+}
+
+// Same rationale as writeEntryToWeekCaches, for delete: removes `id` from
+// every cached week list for this person rather than invalidating them.
+function removeEntryFromWeekCaches(
+  queryClient: QueryClient,
+  personId: string,
+  id: string,
+) {
+  const cachedWeeks = queryClient.getQueriesData<TimeEntry[]>({
+    queryKey: ["timeEntries", "week", personId],
+  });
+
+  for (const [key, entries] of cachedWeeks) {
+    if (entries?.some((entry) => entry.id === id)) {
+      queryClient.setQueryData(
+        key,
+        entries.filter((entry) => entry.id !== id),
+      );
+    }
+  }
+}
+
 // Backs the edit route (`/entries/:id`, ADR 0004). Falls back to a direct
 // fetch-by-id when the entry isn't in any cached week — the route may be
 // reached with nothing cached yet (a fresh tab, a direct link, a reload).
@@ -98,10 +187,8 @@ export function useTimeEntry(session: Session | null, id: string | undefined) {
   });
 }
 
-// Invalidates every cached week for this person rather than just the
-// currently viewed one, so a stale week the user navigates back to later
-// also refetches — matching the "mutation-driven invalidation" approach
-// from docs/spec.md rather than hand-merging the new entry into the cache.
+// Writes the created entry straight into its week's cache (see
+// writeEntryToWeekCaches) rather than invalidating and refetching.
 export function useCreateTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 
@@ -112,17 +199,18 @@ export function useCreateTimeEntry(session: Session | null) {
       }
       return createTimeEntry(session, session.personId, input);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["timeEntries", "week", session?.personId ?? null],
-      });
+    onSuccess: (createdEntry) => {
+      if (!session) {
+        return;
+      }
+      writeEntryToWeekCaches(queryClient, session.personId, createdEntry);
     },
   });
 }
 
-// Same mutation-driven invalidation as useCreateTimeEntry, plus seeding the
-// detail cache with the fresh result so a popup left open right after saving
-// (or reopened immediately after) reflects it without waiting on a refetch.
+// Same direct-write approach as useCreateTimeEntry, plus seeding the detail
+// cache with the fresh result so a popup left open right after saving (or
+// reopened immediately after) reflects it without waiting on a refetch.
 export function useUpdateTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 
@@ -134,9 +222,10 @@ export function useUpdateTimeEntry(session: Session | null) {
       return updateTimeEntry(session, input);
     },
     onSuccess: (updatedEntry) => {
-      queryClient.invalidateQueries({
-        queryKey: ["timeEntries", "week", session?.personId ?? null],
-      });
+      if (!session) {
+        return;
+      }
+      writeEntryToWeekCaches(queryClient, session.personId, updatedEntry);
       queryClient.setQueryData(
         ["timeEntries", "detail", updatedEntry.id],
         updatedEntry,
@@ -145,7 +234,7 @@ export function useUpdateTimeEntry(session: Session | null) {
   });
 }
 
-// Same mutation-driven invalidation as the other time entry mutations, plus
+// Same direct-write approach as the other time entry mutations, plus
 // dropping the detail cache entry so a stale copy can't resurface (e.g. via
 // EntryDeepLink) after the entry no longer exists.
 export function useDeleteTimeEntry(session: Session | null) {
@@ -159,9 +248,9 @@ export function useDeleteTimeEntry(session: Session | null) {
       return deleteTimeEntry(session, id);
     },
     onSuccess: (_data, id) => {
-      queryClient.invalidateQueries({
-        queryKey: ["timeEntries", "week", session?.personId ?? null],
-      });
+      if (session) {
+        removeEntryFromWeekCaches(queryClient, session.personId, id);
+      }
       queryClient.removeQueries({ queryKey: ["timeEntries", "detail", id] });
     },
   });
