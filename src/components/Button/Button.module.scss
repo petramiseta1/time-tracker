@@ -6,6 +6,11 @@
   border-radius: var(--radius-sm);
   font-family: inherit;
   cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
 
   &:disabled {
     opacity: 0.5;
@@ -20,6 +25,12 @@
   color: var(--color-surface);
   font-size: 0.875rem;
   font-weight: 600;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-text) 88%, white);
+    }
+  }
 }
 
 // Pink solid CTA — e.g. "Save entry"/"Save changes" on the entry form.
@@ -32,6 +43,16 @@
   font-size: 0.84375rem;
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(146, 58, 80, 0.2);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: color-mix(
+        in srgb,
+        var(--color-accent) 72%,
+        var(--color-accent-strong)
+      );
+    }
+  }
 }
 
 // Bordered neutral action — e.g. "Today", "Retry".
@@ -42,17 +63,29 @@
   color: var(--color-text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: var(--color-surface-muted);
+      border-color: var(--color-accent-border);
+      color: var(--color-text);
+    }
+  }
 }
 
 // Borderless text action — e.g. "Log out".
 .ghost {
   background: none;
-  padding: 0;
+  padding: var(--space-1) var(--space-2);
+  margin: calc(var(--space-1) * -1) calc(var(--space-2) * -1);
   color: var(--color-text-muted);
   font-size: 0.8125rem;
 
-  &:hover {
-    color: var(--color-text-secondary);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      color: var(--color-text);
+      background: var(--color-surface-muted);
+    }
   }
 }
 
@@ -64,6 +97,14 @@
   background: var(--color-surface);
   color: var(--color-text-secondary);
   font-size: 0.875rem;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: var(--color-surface-muted);
+      border-color: var(--color-accent-border);
+      color: var(--color-text);
+    }
+  }
 }
 
 // Solid destructive CTA — e.g. delete confirmation's "Delete". Same weight
@@ -76,6 +117,16 @@
   font-size: 0.84375rem;
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(146, 58, 80, 0.2);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: color-mix(
+        in srgb,
+        var(--color-accent-strong) 82%,
+        var(--color-text)
+      );
+    }
+  }
 }
 
 .fullWidth {

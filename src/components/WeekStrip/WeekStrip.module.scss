@@ -25,6 +25,10 @@
   text-align: left;
   cursor: pointer;
   min-height: 52px;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
 
   @media (max-width: $breakpoint-mobile) {
     padding: 6px 4px;
@@ -34,6 +38,17 @@
     border-color: var(--color-accent);
     background: var(--color-accent-bg-subtle);
     box-shadow: 0 0 0 3px var(--color-accent-bg);
+  }
+
+  @media (hover: hover) {
+    &:hover:not(.selected) {
+      background: var(--color-accent-bg-subtle);
+      border-color: var(--color-accent-border);
+    }
+
+    &.selected:hover {
+      background: var(--color-accent-bg);
+    }
   }
 }
 
