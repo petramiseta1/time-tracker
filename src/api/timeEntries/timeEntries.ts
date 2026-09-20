@@ -14,6 +14,9 @@ type TimeEntryResource = {
 
 type TimeEntriesResponse = {
   data: TimeEntryResource[];
+  links?: {
+    next?: string | null;
+  };
 };
 
 export type TimeEntry = {
@@ -139,9 +142,11 @@ export async function deleteTimeEntry(
   });
 }
 
-// One request per week range (see docs/adr/0006-week-strip-in-day-view.md) —
-// the day view's own list and the week strip's per-day totals are both
-// derived client-side from this same result, rather than fetching per day.
+// One week range (see docs/adr/0006-week-strip-in-day-view.md) — the day
+// view's list and the week strip's per-day totals are both derived
+// client-side from this same result, rather than fetching per day.
+// Walks cursor pages (`page[after]` / `links.next`) so a week with more
+// than `page[size]` entries is not silently truncated.
 export async function fetchTimeEntriesForRange(
   credentials: ApiCredentials,
   personId: string,
@@ -152,13 +157,18 @@ export async function fetchTimeEntriesForRange(
     `filter[person_id]=${encodeURIComponent(personId)}`,
     `filter[after]=${encodeURIComponent(toDateKey(start))}`,
     `filter[before]=${encodeURIComponent(toDateKey(end))}`,
+    `page[after]=`,
     `page[size]=200`,
   ].join("&");
 
-  const response = await apiRequest<TimeEntriesResponse>(
-    `time_entries?${query}`,
-    credentials,
-  );
+  const entries: TimeEntry[] = [];
+  let path: string | undefined = `time_entries?${query}`;
 
-  return response.data.map(mapTimeEntry);
+  while (path) {
+    const response: TimeEntriesResponse = await apiRequest(path, credentials);
+    entries.push(...response.data.map(mapTimeEntry));
+    path = response.links?.next ?? undefined;
+  }
+
+  return entries;
 }

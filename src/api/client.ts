@@ -29,7 +29,11 @@ export async function apiRequest<TResponse>(
   credentials: ApiCredentials,
   options: ApiRequestOptions = {},
 ): Promise<TResponse> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  // Absolute URLs (e.g. JSON:API `links.next`) are requested as-is;
+  // everything else is treated as a path under API_BASE_URL.
+  const url = path.startsWith("https://") ? path : `${API_BASE_URL}${path}`;
+
+  const response = await fetch(url, {
     method: options.method ?? "GET",
     cache: "no-store",
     headers: {
