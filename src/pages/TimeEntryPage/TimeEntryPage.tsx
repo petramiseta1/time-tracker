@@ -89,7 +89,12 @@ export function TimeEntryPage() {
           <span className={styles.logoMark} />
           <h1 className={styles.title}>Time Tracker</h1>
         </div>
-        <DateNav selectedDate={selectedDate} onSelectDate={handleSelectDate} />
+        <div className={styles.dateNavWrapper}>
+          <DateNav
+            selectedDate={selectedDate}
+            onSelectDate={handleSelectDate}
+          />
+        </div>
         <div className={styles.headerRight}>
           {session?.personName && <Avatar name={session.personName} />}
           <Button variant="ghost" onClick={logout}>

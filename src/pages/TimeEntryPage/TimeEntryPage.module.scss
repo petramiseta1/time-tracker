@@ -16,7 +16,19 @@
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 
+  // Below the breakpoint, plain flex-wrap stacks brand/nav/logout each onto
+  // their own line in DOM order — Log out ends up on a third row, left-
+  // aligned, instead of pinned to the top-right next to the brand. An
+  // explicit two-row grid keeps brand + Log out together on row one
+  // regardless of source order, with the date nav given its own full-width
+  // row below.
   @media (max-width: $breakpoint-mobile) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "brand right" "nav nav";
+    align-items: center;
+    column-gap: var(--space-3);
+    row-gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
   }
 }
@@ -25,6 +37,16 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-area: brand;
+  }
+}
+
+.dateNavWrapper {
+  @media (max-width: $breakpoint-mobile) {
+    grid-area: nav;
+  }
 }
 
 .logoMark {
@@ -45,6 +67,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-4);
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-area: right;
+    justify-self: end;
+  }
 }
 
 .main {
@@ -63,12 +90,17 @@
   background: var(--color-surface-muted);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: var(--space-3);
+  }
 }
 
 .toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }

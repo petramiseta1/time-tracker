@@ -1,7 +1,13 @@
+@use "../../styles/scss-variables" as *;
+
 .strip {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--space-2);
+
+  @media (max-width: $breakpoint-mobile) {
+    gap: var(--space-1);
+  }
 }
 
 .day {
@@ -14,6 +20,10 @@
   text-align: left;
   cursor: pointer;
   min-height: 52px;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 6px 4px;
+  }
 
   &.selected {
     border-color: var(--color-accent);
@@ -63,6 +73,13 @@
   font-size: 0.6875rem;
   color: var(--color-text-faint);
 
+  // Dropped at mobile widths — the weekday label + hours are enough to
+  // read the strip at a glance, and the day-of-month no longer fits
+  // legibly next to them in a ~40px cell.
+  @media (max-width: $breakpoint-mobile) {
+    display: none;
+  }
+
   .selected & {
     color: var(--color-accent-text);
   }
@@ -80,6 +97,10 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--color-text);
+
+  @media (max-width: $breakpoint-mobile) {
+    font-size: 0.6875rem;
+  }
 
   .selected & {
     color: var(--color-accent-text);
