@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, type LoginFailureReason } from "../../context/AuthContext";
 import { Button } from "../../components/Button";
@@ -26,7 +26,7 @@ export function LoginPage() {
   const canSubmit =
     token.trim() !== "" && organizationId.trim() !== "" && !isSubmitting;
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canSubmit) {
       return;
