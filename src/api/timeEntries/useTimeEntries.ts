@@ -1,7 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Session } from "../../context/AuthContext";
 import { getWeekEnd, getWeekStart, toDateKey } from "../../utils/date";
-import { fetchTimeEntriesForRange } from "./timeEntries";
+import {
+  createTimeEntry,
+  fetchTimeEntriesForRange,
+  type NewTimeEntryInput,
+} from "./timeEntries";
 
 // Keyed by the week's start date, not the selected day — so moving between
 // days within the same week reuses this query instead of refetching, per
@@ -36,5 +40,27 @@ export function useWeekTimeEntries(
       );
     },
     enabled: session !== null,
+  });
+}
+
+// Invalidates every cached week for this person rather than just the
+// currently viewed one, so a stale week the user navigates back to later
+// also refetches — matching the "mutation-driven invalidation" approach
+// from docs/spec.md rather than hand-merging the new entry into the cache.
+export function useCreateTimeEntry(session: Session | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: NewTimeEntryInput) => {
+      if (!session) {
+        throw new Error("useCreateTimeEntry called without a session");
+      }
+      return createTimeEntry(session, session.personId, input);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeEntries", "week", session?.personId ?? null],
+      });
+    },
   });
 }

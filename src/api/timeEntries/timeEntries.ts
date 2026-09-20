@@ -32,6 +32,51 @@ function mapTimeEntry(resource: TimeEntryResource): TimeEntry {
   };
 }
 
+export type NewTimeEntryInput = {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+  description: string;
+  serviceId: string;
+};
+
+type CreateTimeEntryResponse = {
+  data: TimeEntryResource;
+};
+
+// `service` is required in practice, despite the assignment stating other
+// TimeEntry relations are irrelevant — see
+// docs/adr/0009-default-service-resolution.md. No `task` relationship;
+// that one really does appear optional.
+export async function createTimeEntry(
+  credentials: ApiCredentials,
+  personId: string,
+  input: NewTimeEntryInput,
+): Promise<TimeEntry> {
+  const response = await apiRequest<CreateTimeEntryResponse>(
+    "time_entries",
+    credentials,
+    {
+      method: "POST",
+      body: {
+        data: {
+          type: "time_entries",
+          attributes: {
+            date: input.date,
+            time: input.minutes,
+            note: input.description,
+          },
+          relationships: {
+            person: { data: { type: "people", id: personId } },
+            service: { data: { type: "services", id: input.serviceId } },
+          },
+        },
+      },
+    },
+  );
+
+  return mapTimeEntry(response.data);
+}
+
 // One request per week range (see docs/adr/0006-week-strip-in-day-view.md) —
 // the day view's own list and the week strip's per-day totals are both
 // derived client-side from this same result, rather than fetching per day.

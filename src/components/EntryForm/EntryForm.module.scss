@@ -1,0 +1,63 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dialog);
+  padding: var(--space-5);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--color-text-faint);
+
+  &:hover {
+    color: var(--color-text-muted);
+  }
+}
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: calc(var(--space-3) * -1) 0 var(--space-4);
+}
+
+.chip {
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-full);
+  padding: 5px 11px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-text);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

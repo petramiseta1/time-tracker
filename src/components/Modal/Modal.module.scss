@@ -1,0 +1,23 @@
+@use "../../styles/scss-variables" as *;
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(25, 24, 23, 0.32);
+  padding: var(--space-4);
+  z-index: 1000;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  max-height: 100%;
+  overflow-y: auto;
+
+  @media (max-width: $breakpoint-mobile) {
+    max-width: none;
+  }
+}

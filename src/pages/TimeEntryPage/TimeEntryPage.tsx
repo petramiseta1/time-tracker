@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
 import { useWeekTimeEntries } from "../../api/timeEntries";
@@ -7,7 +7,9 @@ import { Avatar } from "../../components/Avatar";
 import { Button } from "../../components/Button";
 import { DateNav } from "../../components/DateNav";
 import { WeekStrip } from "../../components/WeekStrip";
+import { EntryForm } from "../../components/EntryForm";
 import { EntryList } from "../../components/EntryList";
+import { Modal } from "../../components/Modal";
 import { EmptyState } from "../../components/EmptyState";
 import { ErrorBanner } from "../../components/ErrorBanner";
 import {
@@ -24,6 +26,7 @@ export function TimeEntryPage() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
   const { date: dateParam } = useParams<{ date: string }>();
+  const [isAddingEntry, setIsAddingEntry] = useState(false);
 
   // Hooks below must run unconditionally even for a bad param (a malformed
   // `/day/:date` — a typo, garbage, or a leap-day rollover) — the fallback
@@ -104,6 +107,23 @@ export function TimeEntryPage() {
         />
 
         <div className={styles.content}>
+          {!isPending && (
+            <div className={styles.toolbar}>
+              <p className={styles.summary}>
+                {!isError && dayEntries.length > 0
+                  ? `${dayEntries.length} ${
+                      dayEntries.length === 1 ? "entry" : "entries"
+                    } · ${formatHoursDecimal(dayTotalMinutes)} / ${
+                      DAILY_TARGET_MINUTES / 60
+                    } h logged`
+                  : null}
+              </p>
+              <Button variant="accent" onClick={() => setIsAddingEntry(true)}>
+                + Add entry
+              </Button>
+            </div>
+          )}
+
           {isPending && (
             <div
               className={styles.skeleton}
@@ -132,18 +152,19 @@ export function TimeEntryPage() {
           )}
 
           {!isPending && !isError && dayEntries.length > 0 && (
-            <>
-              <p className={styles.summary}>
-                {dayEntries.length}{" "}
-                {dayEntries.length === 1 ? "entry" : "entries"} ·{" "}
-                {formatHoursDecimal(dayTotalMinutes)} /{" "}
-                {DAILY_TARGET_MINUTES / 60} h logged
-              </p>
-              <EntryList entries={dayEntries} />
-            </>
+            <EntryList entries={dayEntries} />
           )}
         </div>
       </main>
+
+      {isAddingEntry && (
+        <Modal onClose={() => setIsAddingEntry(false)}>
+          <EntryForm
+            date={selectedDate}
+            onClose={() => setIsAddingEntry(false)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

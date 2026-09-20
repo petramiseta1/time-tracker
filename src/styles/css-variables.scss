@@ -37,6 +37,9 @@
   --color-danger-text-strong: #9e4a60;
   --color-danger-bg: #fdf2f4;
   --color-danger-border: #f3d9df;
+  // Stronger border for an invalid field itself (vs. the lighter
+  // --color-danger-border used around an error banner/box).
+  --color-danger-border-strong: #d87e93;
 
   // Misc
   --color-progress-track: #f0edea;
