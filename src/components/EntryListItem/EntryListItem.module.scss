@@ -1,6 +1,48 @@
 @use "../../styles/scss-variables" as *;
 
+// Plays whenever a row mounts — a freshly-added entry (new to the list, so
+// React mounts a fresh DOM node for it) as well as a full-list remount when
+// switching days. Existing rows are unaffected since React reconciles them
+// by key instead of remounting.
+@keyframes itemIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+// The <li> itself is a 1-row grid so its height can be transitioned to 0
+// with plain CSS (grid-template-rows accepts fr units and animates them,
+// unlike height/auto) — this is what lets EntryList keep a deleted row
+// mounted for REMOVE_ANIMATION_MS and have it collapse smoothly instead of
+// the list snapping shut the instant it's removed. See EntryList.tsx.
 .item {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 200ms ease-in,
+    opacity 200ms ease-in;
+  animation: itemIn 220ms ease-out both;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.itemRemoving {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.itemInner {
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);

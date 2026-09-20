@@ -1,5 +1,31 @@
 @use "../../styles/scss-variables" as *;
 
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes backdropOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+@keyframes dialogOut {
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -9,6 +35,11 @@
   background: rgba(25, 24, 23, 0.32);
   padding: var(--space-4);
   z-index: 1000;
+  animation: backdropIn 180ms ease-out both;
+}
+
+.backdropClosing {
+  animation: backdropOut 160ms ease-in both;
 }
 
 .dialog {
@@ -16,8 +47,22 @@
   max-width: 420px;
   max-height: 100%;
   overflow-y: auto;
+  animation: dialogIn 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
 
   @media (max-width: $breakpoint-mobile) {
     max-width: none;
+  }
+}
+
+.dialogClosing {
+  animation: dialogOut 160ms ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .backdropClosing,
+  .dialog,
+  .dialogClosing {
+    animation: none;
   }
 }

@@ -171,11 +171,7 @@ export function TimeEntryPage() {
           onClose={() => setIsAddingEntry(false)}
           labelledBy={addEntryTitleId}
         >
-          <EntryForm
-            date={selectedDate}
-            onClose={() => setIsAddingEntry(false)}
-            titleId={addEntryTitleId}
-          />
+          <EntryForm date={selectedDate} titleId={addEntryTitleId} />
         </Modal>
       )}
     </div>

@@ -40,7 +40,7 @@ export function EntryEditOverlay() {
 
   return (
     <Modal onClose={close} labelledBy={titleId}>
-      <EntryForm mode="edit" entry={entry} onClose={close} titleId={titleId} />
+      <EntryForm mode="edit" entry={entry} titleId={titleId} />
     </Modal>
   );
 }

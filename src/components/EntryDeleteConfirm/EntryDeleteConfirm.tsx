@@ -5,11 +5,11 @@ import { useToast } from "../../context/ToastContext";
 import { formatShortDate, fromDateKey } from "../../utils/date";
 import { formatDuration } from "../../utils/duration";
 import { Button } from "../Button";
+import { useModalClose } from "../Modal";
 import styles from "./EntryDeleteConfirm.module.scss";
 
 type EntryDeleteConfirmProps = {
   entry: TimeEntry;
-  onClose: () => void;
   titleId?: string;
 };
 
@@ -19,12 +19,12 @@ type EntryDeleteConfirmProps = {
 // (User Story 4), not a deep-linkable URL like edit's.
 export function EntryDeleteConfirm({
   entry,
-  onClose,
   titleId,
 }: EntryDeleteConfirmProps) {
   const { session } = useAuth();
   const { showToast } = useToast();
   const deleteTimeEntry = useDeleteTimeEntry(session);
+  const onClose = useModalClose();
 
   async function handleDelete() {
     try {

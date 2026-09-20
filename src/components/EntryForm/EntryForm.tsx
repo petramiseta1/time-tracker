@@ -10,11 +10,12 @@ import { Button } from "../Button";
 import { NumberInput } from "../NumberInput";
 import { TextArea } from "../TextArea";
 import { TextField } from "../TextField";
+import { useModalClose } from "../Modal";
 import styles from "./EntryForm.module.scss";
 
 const DURATION_CHIPS = ["15m", "30m", "1h", "2h"];
 
-type EntryFormProps = { onClose: () => void; titleId?: string } & (
+type EntryFormProps = { titleId?: string } & (
   { mode?: "create"; date: Date } | { mode: "edit"; entry: TimeEntry }
 );
 
@@ -27,7 +28,8 @@ type EntryFormProps = { onClose: () => void; titleId?: string } & (
 // unmounting this component on close is what resets its fields for next
 // time. Edit's own route/lifecycle is owned by EntryEditOverlay instead.
 export function EntryForm(props: EntryFormProps) {
-  const { onClose, titleId } = props;
+  const { titleId } = props;
+  const onClose = useModalClose();
   const isEdit = props.mode === "edit";
   const { session } = useAuth();
   const { showToast } = useToast();
