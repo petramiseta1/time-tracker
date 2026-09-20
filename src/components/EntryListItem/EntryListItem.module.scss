@@ -35,3 +35,21 @@
   color: var(--color-text);
   white-space: pre-line;
 }
+
+.editLink {
+  align-self: flex-start;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-sm);
+  padding: 5px 11px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-text);
+  }
+}

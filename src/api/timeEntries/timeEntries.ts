@@ -39,7 +39,14 @@ export type NewTimeEntryInput = {
   serviceId: string;
 };
 
-type CreateTimeEntryResponse = {
+export type UpdateTimeEntryInput = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  minutes: number;
+  description: string;
+};
+
+type SingleTimeEntryResponse = {
   data: TimeEntryResource;
 };
 
@@ -52,7 +59,7 @@ export async function createTimeEntry(
   personId: string,
   input: NewTimeEntryInput,
 ): Promise<TimeEntry> {
-  const response = await apiRequest<CreateTimeEntryResponse>(
+  const response = await apiRequest<SingleTimeEntryResponse>(
     "time_entries",
     credentials,
     {
@@ -68,6 +75,52 @@ export async function createTimeEntry(
           relationships: {
             person: { data: { type: "people", id: personId } },
             service: { data: { type: "services", id: input.serviceId } },
+          },
+        },
+      },
+    },
+  );
+
+  return mapTimeEntry(response.data);
+}
+
+// Single-resource GET, used to resolve an entry directly by id — the edit
+// route (`/entries/:id`, ADR 0004) may be reached with nothing about that
+// entry cached yet (a fresh tab, a direct link, a reload), so it can't rely
+// on the week list already having fetched it.
+export async function fetchTimeEntry(
+  credentials: ApiCredentials,
+  id: string,
+): Promise<TimeEntry> {
+  const response = await apiRequest<SingleTimeEntryResponse>(
+    `time_entries/${id}`,
+    credentials,
+  );
+
+  return mapTimeEntry(response.data);
+}
+
+// No `service` relationship on the request body — the edit form only ever
+// touches date/duration/description (docs/adr/0009-default-service-resolution.md
+// covers why `service` matters for create; it's unrelated to editing an
+// entry that already has one).
+export async function updateTimeEntry(
+  credentials: ApiCredentials,
+  input: UpdateTimeEntryInput,
+): Promise<TimeEntry> {
+  const response = await apiRequest<SingleTimeEntryResponse>(
+    `time_entries/${input.id}`,
+    credentials,
+    {
+      method: "PATCH",
+      body: {
+        data: {
+          type: "time_entries",
+          id: input.id,
+          attributes: {
+            date: input.date,
+            time: input.minutes,
+            note: input.description,
           },
         },
       },

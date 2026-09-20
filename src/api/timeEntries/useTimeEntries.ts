@@ -1,10 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import type { Session } from "../../context/AuthContext";
 import { getWeekEnd, getWeekStart, toDateKey } from "../../utils/date";
 import {
   createTimeEntry,
   fetchTimeEntriesForRange,
+  fetchTimeEntry,
+  updateTimeEntry,
   type NewTimeEntryInput,
+  type TimeEntry,
+  type UpdateTimeEntryInput,
 } from "./timeEntries";
 
 // Keyed by the week's start date, not the selected day — so moving between
@@ -43,6 +52,51 @@ export function useWeekTimeEntries(
   });
 }
 
+// Looks for the entry in whichever week queries are already cached, so
+// useTimeEntry can render instantly when opened from an already-loaded list
+// (the common in-app Edit-click path) instead of waiting on a fresh fetch.
+function findCachedTimeEntry(
+  queryClient: QueryClient,
+  personId: string | undefined,
+  id: string | undefined,
+): TimeEntry | undefined {
+  if (!personId || !id) {
+    return undefined;
+  }
+
+  const cachedWeeks = queryClient.getQueriesData<TimeEntry[]>({
+    queryKey: ["timeEntries", "week", personId],
+  });
+
+  for (const [, entries] of cachedWeeks) {
+    const match = entries?.find((entry) => entry.id === id);
+    if (match) {
+      return match;
+    }
+  }
+
+  return undefined;
+}
+
+// Backs the edit route (`/entries/:id`, ADR 0004). Falls back to a direct
+// fetch-by-id when the entry isn't in any cached week — the route may be
+// reached with nothing cached yet (a fresh tab, a direct link, a reload).
+export function useTimeEntry(session: Session | null, id: string | undefined) {
+  const queryClient = useQueryClient();
+
+  return useQuery({
+    queryKey: ["timeEntries", "detail", id ?? null],
+    queryFn: () => {
+      if (!session || !id) {
+        throw new Error("useTimeEntry called without a session or id");
+      }
+      return fetchTimeEntry(session, id);
+    },
+    enabled: session !== null && id !== undefined,
+    initialData: () => findCachedTimeEntry(queryClient, session?.personId, id),
+  });
+}
+
 // Invalidates every cached week for this person rather than just the
 // currently viewed one, so a stale week the user navigates back to later
 // also refetches — matching the "mutation-driven invalidation" approach
@@ -61,6 +115,31 @@ export function useCreateTimeEntry(session: Session | null) {
       queryClient.invalidateQueries({
         queryKey: ["timeEntries", "week", session?.personId ?? null],
       });
+    },
+  });
+}
+
+// Same mutation-driven invalidation as useCreateTimeEntry, plus seeding the
+// detail cache with the fresh result so a popup left open right after saving
+// (or reopened immediately after) reflects it without waiting on a refetch.
+export function useUpdateTimeEntry(session: Session | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: UpdateTimeEntryInput) => {
+      if (!session) {
+        throw new Error("useUpdateTimeEntry called without a session");
+      }
+      return updateTimeEntry(session, input);
+    },
+    onSuccess: (updatedEntry) => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeEntries", "week", session?.personId ?? null],
+      });
+      queryClient.setQueryData(
+        ["timeEntries", "detail", updatedEntry.id],
+        updatedEntry,
+      );
     },
   });
 }

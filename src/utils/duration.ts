@@ -12,6 +12,15 @@ export function formatHoursDecimal(minutes: number): string {
   return (minutes / 60).toFixed(1);
 }
 
+// Inverse of parseDuration's `h:mm` form — pre-fills the edit form's duration
+// field with the entry's current value in a shape parseDuration accepts back
+// unchanged, so leaving it untouched and resaving round-trips exactly.
+export function formatDurationInput(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours}:${String(mins).padStart(2, "0")}`;
+}
+
 const HOURS_MINUTES_PATTERN = /^(\d+):([0-5]?\d)$/;
 const MINUTES_SUFFIX_PATTERN = /^(\d+(?:\.\d+)?)m$/i;
 const HOURS_SUFFIX_PATTERN = /^(\d+(?:\.\d+)?)h$/i;

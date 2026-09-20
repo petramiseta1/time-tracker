@@ -7,12 +7,10 @@ type ModalProps = {
   children: ReactNode;
 };
 
-// Plain centered overlay (portaled to <body>, not anchored to any row) —
-// distinct from the Floating-UI-anchored popups planned for edit/delete
-// (docs/tech-stack.md), which need viewport-aware positioning relative to
-// an entry row that this doesn't. Still no dedicated route for add
-// (docs/adr/0007-add-entry-stays-inline.md) — this is purely a visual
-// presentation choice, driven by local component state.
+// Plain centered overlay, portaled to <body> — shared by add (no route,
+// docs/adr/0007-add-entry-stays-inline.md, shown/hidden via local component
+// state) and edit (its own route, docs/adr/0004-route-driven-entry-overlay.md,
+// shown/hidden by whether that route matches).
 export function Modal({ onClose, children }: ModalProps) {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
