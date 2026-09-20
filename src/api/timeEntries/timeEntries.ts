@@ -21,9 +21,9 @@ type TimeEntriesResponse = {
 
 export type TimeEntry = {
   id: string;
-  date: string; // YYYY-MM-DD, from the API's `date`
-  minutes: number; // from the API's `time`
-  description: string; // from the API's `note`
+  date: string; // YYYY-MM-DD
+  minutes: number; // API `time`
+  description: string; // API `note`
 };
 
 function mapTimeEntry(resource: TimeEntryResource): TimeEntry {
@@ -53,10 +53,7 @@ type SingleTimeEntryResponse = {
   data: TimeEntryResource;
 };
 
-// `service` is required in practice, despite the assignment stating other
-// TimeEntry relations are irrelevant — see
-// docs/adr/0009-default-service-resolution.md. No `task` relationship;
-// that one really does appear optional.
+// The API requires a `service` relationship on create.
 export async function createTimeEntry(
   credentials: ApiCredentials,
   personId: string,
@@ -87,10 +84,7 @@ export async function createTimeEntry(
   return mapTimeEntry(response.data);
 }
 
-// Single-resource GET, used to resolve an entry directly by id — the edit
-// route (`/day/:date/entries/:id`, ADR 0004) may be reached with nothing
-// about that entry cached yet (a fresh tab, a direct link, a reload), so
-// it can't rely on the week list already having fetched it.
+// Used when the edit route is opened with nothing in the week cache.
 export async function fetchTimeEntry(
   credentials: ApiCredentials,
   id: string,
@@ -103,10 +97,6 @@ export async function fetchTimeEntry(
   return mapTimeEntry(response.data);
 }
 
-// No `service` relationship on the request body — the edit form only ever
-// touches date/duration/description (docs/adr/0009-default-service-resolution.md
-// covers why `service` matters for create; it's unrelated to editing an
-// entry that already has one).
 export async function updateTimeEntry(
   credentials: ApiCredentials,
   input: UpdateTimeEntryInput,
@@ -142,11 +132,7 @@ export async function deleteTimeEntry(
   });
 }
 
-// One week range (see docs/adr/0006-week-strip-in-day-view.md) — the day
-// view's list and the week strip's per-day totals are both derived
-// client-side from this same result, rather than fetching per day.
-// Walks cursor pages (`page[after]` / `links.next`) so a week with more
-// than `page[size]` entries is not silently truncated.
+// Week range; walks `links.next` so results aren't truncated at page size.
 export async function fetchTimeEntriesForRange(
   credentials: ApiCredentials,
   personId: string,

@@ -5,9 +5,7 @@ import { ToastStack } from "./components/Toast";
 import { AuthProvider } from "./context/AuthContext";
 import { AppRoutes } from "./routers";
 
-// No retries: a failed request should surface its error state right away
-// (we always show an explicit Retry action) rather than sit on the loading
-// state through several seconds of automatic exponential-backoff retries.
+// Surface errors immediately — the UI has an explicit Retry.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false },

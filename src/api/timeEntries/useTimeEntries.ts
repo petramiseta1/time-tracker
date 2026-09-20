@@ -22,13 +22,8 @@ import {
   type UpdateTimeEntryInput,
 } from "./timeEntries";
 
-// Keyed by the week's start date, not the selected day — so moving between
-// days within the same week reuses this query instead of refetching, per
-// docs/adr/0006-week-strip-in-day-view.md.
-//
-// Accepts a possibly-null session so callers on a RequireAuth-guarded route
-// don't need to assert non-null themselves; the query simply stays disabled
-// until a session exists.
+// Keyed by week start so moving between days in the same week reuses the
+// query. `session` may be null; the query stays disabled until one exists.
 export function useWeekTimeEntries(
   session: Session | null,
   selectedDate: Date,
@@ -58,9 +53,7 @@ export function useWeekTimeEntries(
   });
 }
 
-// Looks for the entry in whichever week queries are already cached, so
-// useTimeEntry can render instantly when opened from an already-loaded list
-// (the common in-app Edit-click path) instead of waiting on a fresh fetch.
+// Prefer a cached week list so Edit can open without a refetch.
 function findCachedTimeEntry(
   queryClient: QueryClient,
   personId: string | undefined,
@@ -93,24 +86,9 @@ function getWeekQueryKey(personId: string, date: Date) {
   ] as const;
 }
 
-// Writes `entry` straight into whichever cached week list it belongs to
-// (by `entry.date`), instead of invalidating and refetching — see
-// docs/adr/0006-week-strip-in-day-view.md for why weeks are the cache unit.
-// `invalidateQueries` would make the mutation's `onSuccess` await a second
-// network round trip (the refetch) before `mutateAsync` resolves; under a
-// throttled connection that makes a successful edit/delete look stuck for
-// a full extra request after the API already confirmed it. A direct write
-// is synchronous, and we already have the authoritative entry back from
-// the API, so there's nothing the refetch would tell us that we don't
-// already know.
-//
-// Replaces an existing copy in place (so its position in that day's list
-// doesn't jump) or appends if it's new to that week, and strips any stale
-// copy left behind in a *different* week's cache — relevant when an edit
-// moves an entry's date across a week boundary. Only touches weeks that
-// are already cached; an uncached week fetches fresh, correct contents
-// the next time it's visited, so nothing needs to be invalidated there
-// either.
+// Patch cached week lists instead of invalidating — a refetch would delay
+// mutateAsync after the API already succeeded. Replaces in place, appends
+// if new, and drops a stale copy when the date crosses a week boundary.
 function writeEntryToWeekCaches(
   queryClient: QueryClient,
   personId: string,
@@ -147,8 +125,7 @@ function writeEntryToWeekCaches(
   }
 }
 
-// Same rationale as writeEntryToWeekCaches, for delete: removes `id` from
-// every cached week list for this person rather than invalidating them.
+// Same as writeEntryToWeekCaches, for delete.
 function removeEntryFromWeekCaches(
   queryClient: QueryClient,
   personId: string,
@@ -168,10 +145,7 @@ function removeEntryFromWeekCaches(
   }
 }
 
-// Backs the edit route (`/day/:date/entries/:id`, ADR 0004). Falls back to
-// a direct fetch-by-id when the entry isn't in any cached week — the route
-// may be reached with nothing cached yet (a fresh tab, a direct link, a
-// reload).
+// Falls back to fetch-by-id when the entry isn't in any cached week.
 export function useTimeEntry(session: Session | null, id: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -188,8 +162,6 @@ export function useTimeEntry(session: Session | null, id: string | undefined) {
   });
 }
 
-// Writes the created entry straight into its week's cache (see
-// writeEntryToWeekCaches) rather than invalidating and refetching.
 export function useCreateTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 
@@ -209,9 +181,6 @@ export function useCreateTimeEntry(session: Session | null) {
   });
 }
 
-// Same direct-write approach as useCreateTimeEntry, plus seeding the detail
-// cache with the fresh result so a popup left open right after saving (or
-// reopened immediately after) reflects it without waiting on a refetch.
 export function useUpdateTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 
@@ -235,9 +204,6 @@ export function useUpdateTimeEntry(session: Session | null) {
   });
 }
 
-// Same direct-write approach as the other time entry mutations, plus
-// dropping the detail cache entry so a stale copy can't resurface (e.g.
-// reopening the edit overlay) after the entry no longer exists.
 export function useDeleteTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 

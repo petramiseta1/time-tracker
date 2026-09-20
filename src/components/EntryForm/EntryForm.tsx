@@ -20,17 +20,7 @@ type EntryFormProps = { titleId?: string } & (
   { mode?: "create"; date: Date } | { mode: "edit"; entry: TimeEntry }
 );
 
-// Shared add/edit form: duration, description, and date. Add defaults the
-// date to the day view's selected day; both modes let it change. After a
-// successful save, if the entry's date is no longer the day the page is
-// showing, we navigate there so the user lands on the day they just wrote
-// to instead of a list that no longer contains it.
-//
-// The day view owns whether the add form is shown at all (its "+ Add
-// entry" trigger); add stays an inline action with no dedicated route
-// (docs/adr/0007-add-entry-stays-inline.md), so the day view unmounting
-// this component on close is what resets its fields for next time. Edit's
-// own route/lifecycle is owned by EntryEditOverlay instead.
+// After a save, navigate to the entry's date if it isn't the day on screen.
 export function EntryForm(props: EntryFormProps) {
   const { titleId } = props;
   const onClose = useModalClose();
@@ -104,9 +94,7 @@ export function EntryForm(props: EntryFormProps) {
         showToast("Entry added.", "success");
       }
       if (dateKey !== pageDate) {
-        // Edit's overlay unmounts with the route change, so skip its
-        // onClose (which would navigate back to the old day). Add is
-        // local state on the day view, so it still needs a close.
+        // Skip edit's onClose — that would navigate back to the old day.
         navigate(`/day/${dateKey}`, { replace: isEdit });
         if (!isEdit) {
           onClose();
@@ -115,8 +103,7 @@ export function EntryForm(props: EntryFormProps) {
         onClose();
       }
     } catch {
-      // Form stays open with the entered values so the user can retry
-      // without re-typing — nothing changed in the list.
+      // Leave the form as-is so the user can retry.
       showToast(
         isEdit
           ? "Couldn't update entry. Please try again."

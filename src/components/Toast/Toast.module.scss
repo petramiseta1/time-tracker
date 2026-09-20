@@ -9,8 +9,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: var(--space-2);
-  // Above Modal (1000) so add/edit/delete feedback stays visible while
-  // the dialog is still open.
+  // Above Modal (1000).
   z-index: 1100;
   pointer-events: none;
 
@@ -28,8 +27,7 @@
   padding: var(--space-3) var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  // Tighter than --shadow-dialog so the chip's edge reads on white, not
-  // just a large soft glow that disappears against the page.
+  // Tighter than --shadow-dialog so the edge reads on white.
   box-shadow:
     0 1px 2px rgba(25, 24, 23, 0.08),
     0 10px 28px -8px rgba(25, 24, 23, 0.28);

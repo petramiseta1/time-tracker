@@ -13,10 +13,6 @@ type EntryDeleteConfirmProps = {
   titleId?: string;
 };
 
-// Confirmation content for ticket 06 — rendered inside the shared Modal,
-// same dialog treatment edit reuses from add (docs/adr/0004). Deletion has
-// no route of its own; the assignment only requires a confirmation step
-// (User Story 4), not a deep-linkable URL like edit's.
 export function EntryDeleteConfirm({
   entry,
   titleId,
@@ -32,9 +28,7 @@ export function EntryDeleteConfirm({
       showToast("Entry deleted.", "success");
       onClose();
     } catch {
-      // Dialog stays open on failure, matching EntryForm's error handling —
-      // the entry is untouched, so nothing to reflect and no reason to lose
-      // the confirmation.
+      // Leave the dialog open so the user can retry.
       showToast("Couldn't delete entry. Please try again.", "error");
     }
   }

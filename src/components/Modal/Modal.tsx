@@ -13,9 +13,6 @@ import styles from "./Modal.module.scss";
 
 type ModalProps = {
   onClose: () => void;
-  // id of the element (usually the dialog's own <h3> title) that names it
-  // for assistive tech — passed in rather than rendered here since each
-  // caller's content owns its own title markup/placement.
   labelledBy?: string;
   children: ReactNode;
 };
@@ -23,20 +20,11 @@ type ModalProps = {
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Matches the dialogOut/backdropOut animation durations in Modal.module.scss
-// — kept in sync manually since CSS can't tell JS how long it's animating.
+// Must match dialogOut/backdropOut in Modal.module.scss.
 const CLOSE_ANIMATION_MS = 160;
 
-// Lets content rendered inside a Modal (EntryForm, EntryDeleteConfirm) ask
-// for the closing animation to play before the modal actually unmounts,
-// instead of calling the parent's onClose directly and cutting the
-// animation short. Modal is the only provider, so useModalClose() assumes
-// one is always an ancestor.
 const ModalCloseContext = createContext<(() => void) | null>(null);
 
-// Context + its hook are colocated deliberately (see docs/tech-stack.md's
-// project structure), so this file exports more than one component-shaped
-// thing — safe to ignore for fast-refresh purposes.
 // eslint-disable-next-line react-refresh/only-export-components
 export function useModalClose(): () => void {
   const requestClose = useContext(ModalCloseContext);
@@ -46,18 +34,11 @@ export function useModalClose(): () => void {
   return requestClose;
 }
 
-// Plain centered overlay, portaled to <body> — shared by add (no route,
-// docs/adr/0007-add-entry-stays-inline.md, shown/hidden via local component
-// state) and edit (its own route, docs/adr/0004-route-driven-entry-overlay.md,
-// shown/hidden by whether that route matches).
 export function Modal({ onClose, labelledBy, children }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [isClosing, setIsClosing] = useState(false);
 
-  // Plays the closing animation, then hands off to the real onClose (which
-  // actually unmounts/navigates away) once it finishes. Backdrop click,
-  // Escape, and any close action inside the dialog's own content all funnel
-  // through this instead of calling onClose straight away.
+  // Animate out, then call onClose.
   const requestClose = useCallback(() => {
     setIsClosing(true);
   }, []);
@@ -73,10 +54,7 @@ export function Modal({ onClose, labelledBy, children }: ModalProps) {
   useEffect(() => {
     const dialog = dialogRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
-    // A child field may already hold focus via its own `autoFocus` (e.g.
-    // EntryForm's duration input) — that fires during commit, before this
-    // effect runs, so don't clobber it by jumping to the first focusable
-    // element regardless.
+    // Don't steal focus from a child that already autoFocused.
     if (!dialog?.contains(document.activeElement)) {
       const firstFocusable =
         dialog?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);

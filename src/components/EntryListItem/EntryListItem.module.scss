@@ -1,9 +1,6 @@
 @use "../../styles/scss-variables" as *;
 
-// Plays whenever a row mounts — a freshly-added entry (new to the list, so
-// React mounts a fresh DOM node for it) as well as a full-list remount when
-// switching days. Existing rows are unaffected since React reconciles them
-// by key instead of remounting.
+// Plays on mount — a newly added entry, or a remount when switching days.
 @keyframes itemIn {
   from {
     opacity: 0;
@@ -11,11 +8,8 @@
   }
 }
 
-// The <li> itself is a 1-row grid so its height can be transitioned to 0
-// with plain CSS (grid-template-rows accepts fr units and animates them,
-// unlike height/auto) — this is what lets EntryList keep a deleted row
-// mounted for REMOVE_ANIMATION_MS and have it collapse smoothly instead of
-// the list snapping shut the instant it's removed. See EntryList.tsx.
+// 1-row grid so height can animate to 0 (unlike height: auto). EntryList
+// keeps a deleted row mounted while this collapses.
 .item {
   display: grid;
   grid-template-rows: 1fr;
@@ -104,9 +98,7 @@
   white-space: pre-line;
 }
 
-// 3 lines is the scan-friendly cap for a day's list. `max-height` is what
-// the overflow measure compares against; line-clamp adds the ellipsis.
-// Keep the 3 in both declarations in sync.
+// Keep line-clamp and max-height in sync (3 lines).
 .clamped {
   overflow: hidden;
   display: -webkit-box;

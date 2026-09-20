@@ -9,21 +9,15 @@ type EntryListProps = {
 
 type Row = { entry: TimeEntry; removing: boolean };
 
-// Must match the .itemRemoving transition duration in
-// EntryListItem.module.scss — how long a deleted row spends collapsing
-// before it's actually dropped from the rendered list.
+// Must match .itemRemoving in EntryListItem.module.scss.
 const REMOVE_ANIMATION_MS = 200;
 
 function toRows(entries: TimeEntry[]): Row[] {
   return entries.map((entry) => ({ entry, removing: false }));
 }
 
-// `entries` is the authoritative day list straight from the cache — the
-// moment a delete succeeds, the deleted id is just gone from it. Rendering
-// that directly would snap the list shut instantly. Instead this keeps a
-// local `rows` copy that mirrors `entries` but holds a just-removed row a
-// beat longer, flagged `removing`, so EntryListItem can play its collapse
-// animation before the row actually disappears.
+// Keep a just-deleted row mounted (flagged `removing`) so it can collapse
+// before leaving the DOM.
 export function EntryList({ entries }: EntryListProps) {
   const [rows, setRows] = useState<Row[]>(() => toRows(entries));
   const rowsRef = useRef(rows);
@@ -34,9 +28,7 @@ export function EntryList({ entries }: EntryListProps) {
     const current = rowsRef.current;
     const hadOverlap = current.some((row) => nextById.has(row.entry.id));
 
-    // A day switch swaps every id in the list at once — there's nothing
-    // shared to animate a removal against, so show the new day outright
-    // instead of playing an exit animation for the entire previous list.
+    // Day switch replaces every id — show the new list without exit animations.
     if (current.length > 0 && !hadOverlap) {
       for (const timeoutId of timeoutsRef.current.values()) {
         clearTimeout(timeoutId);
@@ -53,16 +45,11 @@ export function EntryList({ entries }: EntryListProps) {
     for (const row of current) {
       const updated = remaining.get(row.entry.id);
       if (updated) {
-        // Still present — refresh its data in place (covers edits) without
-        // touching row order or triggering any animation.
         next.push({ entry: updated, removing: false });
         remaining.delete(row.entry.id);
       } else if (row.removing) {
-        // Already collapsing from an earlier diff; its own timeout will
-        // drop it once the animation finishes.
         next.push(row);
       } else {
-        // Just dropped out of `entries` — start the collapse.
         next.push({ entry: row.entry, removing: true });
         const id = row.entry.id;
         const timeoutId = setTimeout(() => {
@@ -74,7 +61,6 @@ export function EntryList({ entries }: EntryListProps) {
       }
     }
 
-    // Anything left in `remaining` is new to the list — append it.
     for (const entry of remaining.values()) {
       next.push({ entry, removing: false });
     }

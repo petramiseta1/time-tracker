@@ -18,7 +18,6 @@
   }
 }
 
-// Dark solid CTA — e.g. the login form's "Continue" submit.
 .primary {
   padding: var(--space-3);
   background: var(--color-text);
@@ -33,9 +32,7 @@
   }
 }
 
-// Pink solid CTA — e.g. "Save entry"/"Save changes" on the entry form.
-// Distinct from .primary: the mockup uses the dark CTA only for the login
-// screen's "Continue", accent pink for every entry-form save action.
+// Accent save actions; `.primary` is the dark login CTA.
 .accent {
   padding: var(--space-3) var(--space-5);
   background: var(--color-accent);
@@ -55,7 +52,6 @@
   }
 }
 
-// Bordered neutral action — e.g. "Today", "Retry".
 .secondary {
   border: 1px solid var(--color-border-input);
   padding: var(--space-2) var(--space-4);
@@ -73,7 +69,6 @@
   }
 }
 
-// Borderless text action — e.g. "Log out".
 .ghost {
   background: none;
   padding: var(--space-1) var(--space-2);
@@ -89,7 +84,6 @@
   }
 }
 
-// Square bordered icon-only action — e.g. prev/next day arrows.
 .icon {
   width: 32px;
   height: 32px;
@@ -107,9 +101,7 @@
   }
 }
 
-// Solid destructive CTA — e.g. delete confirmation's "Delete". Same weight
-// as .accent but using the accent-strong shade the mockup reserves for
-// destructive actions, rather than a separate danger palette.
+// Same weight as `.accent`, using accent-strong instead of a separate danger palette.
 .danger {
   padding: var(--space-3) var(--space-5);
   background: var(--color-accent-strong);

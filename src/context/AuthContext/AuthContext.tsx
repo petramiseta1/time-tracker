@@ -87,11 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (error.status === 401) {
             return { ok: false, reason: "invalid-token" };
           }
-          // The discovery request itself is scoped by the entered
-          // Organization ID (see api/client.ts), so an unrecognized org ID
-          // may make the request fail outright (403/404) rather than
-          // succeed with an empty/no-match result. Treat both the same as
-          // a plain no-match, since either way the token itself is fine.
+          // 403/404 on the org-scoped request means a bad org ID, not a bad token.
           if (error.status === 403 || error.status === 404) {
             return { ok: false, reason: "no-organization" };
           }
@@ -115,9 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Context + its hook are colocated deliberately (see docs/tech-stack.md's
-// project structure), so this file exports more than one component-shaped
-// thing — safe to ignore for fast-refresh purposes.
 // eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);

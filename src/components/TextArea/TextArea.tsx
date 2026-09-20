@@ -7,9 +7,6 @@ type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   error?: string;
 };
 
-// Separate from TextField (see docs/tech-stack.md's "Notes on placement")
-// since multiline text and its own validation error are distinct enough to
-// earn their own component.
 export function TextArea({
   label,
   error,

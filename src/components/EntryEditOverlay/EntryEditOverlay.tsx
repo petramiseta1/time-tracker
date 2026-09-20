@@ -6,11 +6,6 @@ import { useToast } from "../../context/ToastContext";
 import { Modal } from "../Modal";
 import { EntryForm } from "../EntryForm";
 
-// Nested child of `/day/:date` (ADR 0004) — TimeEntryPage stays mounted
-// and this owns just the edit dialog via its <Outlet />. Reuses the same
-// centered Modal as add (docs/adr/0004-route-driven-entry-overlay.md) —
-// the assignment only requires edit to have its own route, not that the
-// form stay visually anchored to its row.
 export function EntryEditOverlay() {
   const { id, date } = useParams<{ id: string; date: string }>();
   const { session } = useAuth();

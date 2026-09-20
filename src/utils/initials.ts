@@ -1,4 +1,3 @@
-// "Ana Kovač" -> "AK", "Ana" -> "AN", "" -> "".
 export function getInitials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);
 

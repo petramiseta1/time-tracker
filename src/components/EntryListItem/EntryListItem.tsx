@@ -10,17 +10,10 @@ import styles from "./EntryListItem.module.scss";
 
 type EntryListItemProps = {
   entry: TimeEntry;
-  // Set by EntryList once this entry has dropped out of the incoming
-  // `entries` prop (i.e. the delete succeeded) — plays the row's collapse
-  // animation before EntryList actually drops it from the DOM.
+  // True while EntryList holds a just-deleted row for its collapse animation.
   removing?: boolean;
 };
 
-// Edit navigates to the nested `/day/:date/entries/:id` route, which
-// keeps this day view mounted and renders the dialog through TimeEntryPage's
-// <Outlet /> (ADR 0004). Delete has no route of its own (ticket 06) — it's
-// local component state, same as add (docs/adr/0007-add-entry-stays-inline.md),
-// toggling the shared Modal.
 export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -30,22 +23,16 @@ export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
   const deleteTitleId = useId();
   const descriptionId = useId();
 
-  // An edit can replace the note in place (same list row, new text). Drop
-  // the expanded state so a now-short description doesn't keep a stale
-  // "Show less", and so a still-long one remeasures against the clamp.
-  // Compared during render (not via a ref or an effect) so the next paint
-  // is already collapsed — React's "adjusting state when a prop changes"
-  // pattern: https://react.dev/learn/you-might-not-need-an-effect
+  // Reset expand state when an edit replaces the note in place, during
+  // render so the next paint is already collapsed.
   const [prevDescription, setPrevDescription] = useState(entry.description);
   if (entry.description !== prevDescription) {
     setPrevDescription(entry.description);
     setIsDescriptionExpanded(false);
   }
 
-  // Clamp is CSS-only; the toggle is shown only when the clamped box
-  // actually overflows. Character count is a bad proxy here: `pre-line`
-  // plus wrapping means a short string with many newlines can overflow
-  // while a long one on a wide screen might not.
+  // Show the toggle only when the CSS clamp actually overflows —
+  // wrapping and newlines make character count a poor proxy.
   useLayoutEffect(() => {
     const el = descriptionRef.current;
     if (!el || isDescriptionExpanded) {

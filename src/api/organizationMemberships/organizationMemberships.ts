@@ -28,11 +28,7 @@ type OrganizationMembershipsResponse = {
 export type ResolvedMembership = {
   organizationId: string;
   personId: string;
-  // Undefined if the API's `people` attributes don't shape up as expected —
-  // the header's avatar is decorative, so we degrade to not showing it
-  // rather than failing login over it. Attribute names (`first_name`/
-  // `last_name`) are the Productive API's documented shape but unconfirmed
-  // against the live test account — worth checking once logged in.
+  // Optional — a missing name shouldn't fail login.
   personName?: string;
 };
 
@@ -47,12 +43,8 @@ function personNameFromAttributes(
   return fullName || undefined;
 }
 
-// include=person is required: by default the API omits the person
-// relationship's resource linkage entirely (relationships.person comes back
-// as just `{ meta: { included: false } }`, no `data`), so the Person id
-// can't be read off the membership without asking for it explicitly. We
-// read it from relationships.person.data if the API populates that once
-// included, falling back to the top-level `included` array otherwise.
+// `include=person` is required; without it the API omits the person id.
+// Prefer relationships.person.data, else the included array.
 export async function findMembershipForOrganization(
   credentials: ApiCredentials,
 ): Promise<ResolvedMembership | null> {

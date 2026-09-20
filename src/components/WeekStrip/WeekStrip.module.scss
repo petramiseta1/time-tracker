@@ -11,10 +11,8 @@
 }
 
 .day {
-  // Whether the label/hours share a row or stack depends on this card's
-  // own rendered width, not the viewport's — seven columns can be too
-  // narrow to fit both side by side well before the page itself hits a
-  // "mobile" breakpoint (e.g. a tablet, or a plain narrow window).
+  // Stack/hide by this card's width, not the viewport — seven columns
+  // get tight before a mobile breakpoint.
   container-type: inline-size;
   position: relative;
 
@@ -86,9 +84,6 @@
   justify-content: space-between;
   gap: var(--space-2);
 
-  // Side-by-side label + hours don't fit once the card itself is
-  // narrower than this — stack them instead of letting the hours text
-  // spill past the card's edge.
   @container (max-width: 90px) {
     flex-direction: column;
     align-items: flex-start;
@@ -119,9 +114,6 @@
   font-size: 0.6875rem;
   color: var(--color-text-faint);
 
-  // Dropped once the card is narrow — the weekday label alone is
-  // enough to read the strip at a glance, and the day-of-month no
-  // longer fits legibly next to it in a cramped cell.
   @container (max-width: 55px) {
     display: none;
   }
@@ -131,9 +123,7 @@
   }
 }
 
-// Sits on the top edge of today's card so it doesn't compete with the
-// weekday/date text, and so the matching pip on the header's Today
-// button can act as a legend for what the marker means.
+// Aligns with the pip on the Today button.
 .todayDot {
   position: absolute;
   top: 0;

@@ -21,19 +21,17 @@ import {
   toDateKey,
 } from "../../utils/date";
 import { DAILY_TARGET_MINUTES, formatHoursDecimal } from "../../utils/duration";
-import styles from "./TimeEntryPage.module.scss";
+import styles from "./DayEntriesPage.module.scss";
 
-export function TimeEntryPage() {
+export function DayEntriesPage() {
   const { session, logout } = useAuth();
   const navigate = useNavigate();
   const { date: dateParam } = useParams<{ date: string }>();
   const [isAddingEntry, setIsAddingEntry] = useState(false);
   const addEntryTitleId = useId();
 
-  // Hooks below must run unconditionally even for a bad param (a malformed
-  // `/day/:date` — a typo, garbage, or a leap-day rollover) — the fallback
-  // "today" here is only ever seen for the one render before the redirect
-  // below takes over, so it never actually reaches the page.
+  // Hooks must run even for a bad `:date`; the fallback is only used for
+  // the render before the redirect.
   const isValidParam = isValidDateKey(dateParam);
   const selectedDate = useMemo(
     () => (isValidParam ? fromDateKey(dateParam) : new Date()),
@@ -49,10 +47,7 @@ export function TimeEntryPage() {
     selectedDate,
   );
 
-  // A 401 means the stored token is no longer valid (expired, revoked, or
-  // tampered with) — the session that RequireAuth let us in with is stale.
-  // Log out so the guard redirects to /login instead of leaving the user
-  // stuck on a page that can never load.
+  // Log out on 401 so RequireAuth sends the user to /login.
   const isSessionExpired =
     isError && error instanceof ApiError && error.status === 401;
 
@@ -175,8 +170,6 @@ export function TimeEntryPage() {
         </Modal>
       )}
 
-      {/* Nested `/day/:date/entries/:id` renders the edit overlay here.
-          Modal portals to document.body, so placement is not visual. */}
       <Outlet />
     </div>
   );

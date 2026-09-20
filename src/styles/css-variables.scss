@@ -1,9 +1,5 @@
-// CSS custom properties (design tokens), sourced from the UI design
-// mockup (Time Tracker.html / the "Design" canvas artifact) rather than
-// placeholder values. Loaded exactly once, globally, via index.scss —
-// component .module.scss files reference these with var(--...) directly
-// and must NOT @use this file themselves, since that would re-emit the
-// :root block into every module that does.
+// Loaded once via index.scss. Do not @use this from component modules —
+// that would re-emit :root into every module.
 
 :root {
   // Surfaces
@@ -15,9 +11,7 @@
   // Text
   --color-text: #191817;
   --color-text-secondary: #55514e;
-  // Darkened from the original design's #7c7773/#a8a29d to clear WCAG AA
-  // (4.5:1) for normal-size text — both were failing at their original
-  // shades (4.43:1 and 2.52:1 on white respectively).
+  // Darkened from #7c7773/#a8a29d to meet WCAG AA.
   --color-text-muted: #797471;
   --color-text-faint: #7b736d;
 
@@ -36,20 +30,15 @@
   --color-accent-text: #8f3a50;
 
   // Danger (errors, delete)
-  // Darkened from the original design's #c25a74 (4.19:1 on white) to clear
-  // WCAG AA — this is used for inline validation error text.
+  // Darkened from #c25a74 to meet WCAG AA.
   --color-danger-text: #be506c;
   --color-danger-text-strong: #9e4a60;
   --color-danger-bg: #fdf2f4;
   --color-danger-border: #f3d9df;
-  // Stronger border for an invalid field itself (vs. the lighter
-  // --color-danger-border used around an error banner/box).
+  // Stronger than --color-danger-border, for invalid fields.
   --color-danger-border-strong: #d87e93;
 
-  // Success (mutation confirmations). Separate hue from the rose accent —
-  // that family is already used for danger, so reusing it for "it worked"
-  // made success toasts read as errors. Fill/border are saturated enough
-  // to read on white/off-white surfaces, with text still clearing WCAG AA.
+  // Separate hue from the rose accent so success toasts don't read as errors.
   --color-success-text: #246338;
   --color-success-bg: #d4edd9;
   --color-success-border: #8fbf98;

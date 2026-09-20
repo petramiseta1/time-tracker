@@ -1,5 +1,3 @@
-// SCSS variable reserved for the one place CSS custom properties can't
-// reach: `@media` query conditions don't accept `var()`. Every other
-// design token lives in css-variables.scss instead.
+// Media queries can't use var(); every other token lives in css-variables.scss.
 
 $breakpoint-mobile: 480px;

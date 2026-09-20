@@ -1,7 +1,5 @@
-// Productive's note field is HTML from its editor, e.g.
-// "<ul><li><p>Testing</p></li></ul>". We only display plain text.
-// DOMParser handles entities and broken markup; the parsed document is
-// never attached to the page or assigned to innerHTML.
+// Productive stores notes as HTML; we display plain text. The parsed
+// document is never attached to the page.
 export function htmlToPlainText(html: string): string {
   if (!html) {
     return "";

@@ -1,7 +1,3 @@
-// Generic JSON:API fetch wrapper. Resource-specific request/mapping modules
-// (organizationMemberships, timeEntries) are built on top of this — see
-// docs/tech-stack.md and docs/adr/0001-hand-rolled-jsonapi-layer.md.
-
 const API_BASE_URL = "https://api.productive.io/api/v2/";
 
 export type ApiCredentials = {
@@ -29,8 +25,7 @@ export async function apiRequest<TResponse>(
   credentials: ApiCredentials,
   options: ApiRequestOptions = {},
 ): Promise<TResponse> {
-  // Absolute URLs (e.g. JSON:API `links.next`) are requested as-is;
-  // everything else is treated as a path under API_BASE_URL.
+  // Absolute URLs (JSON:API `links.next`) are requested as-is.
   const url = path.startsWith("https://") ? path : `${API_BASE_URL}${path}`;
 
   const response = await fetch(url, {

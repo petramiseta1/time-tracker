@@ -21,12 +21,8 @@
   margin: 0 auto;
   padding: var(--space-4) var(--space-6);
 
-  // Below the breakpoint, plain flex-wrap stacks brand/nav/logout each onto
-  // their own line in DOM order — Log out ends up on a third row, left-
-  // aligned, instead of pinned to the top-right next to the brand. An
-  // explicit two-row grid keeps brand + Log out together on row one
-  // regardless of source order, with the date nav given its own full-width
-  // row below.
+  // Two-row grid so Log out stays next to the brand; flex-wrap would
+  // drop it onto its own left-aligned row.
   @media (max-width: $breakpoint-mobile) {
     display: grid;
     grid-template-columns: 1fr auto;

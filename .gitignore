@@ -4,3 +4,13 @@ dist-ssr
 *.local
 .DS_Store
 *.tsbuildinfo
+
+# Working notes and design artifacts — not part of the deliverable.
+# The shipped documentation is README.md and docs/technical-specification.md.
+.scratch/
+.claude/
+CONTEXT.md
+docs/spec.md
+docs/tech-stack.md
+docs/adr/
+Time Tracker.html

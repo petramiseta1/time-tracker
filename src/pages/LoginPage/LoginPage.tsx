@@ -42,10 +42,7 @@ export function LoginPage() {
       return;
     }
 
-    // Login failures stay on the form (field-level where we know which
-    // credential is wrong) rather than a toast. A toast would auto-dismiss
-    // away from the fields the user has to fix; ADR 0002's distinct
-    // messages only help if they stay visible next to those fields.
+    // Keep errors on the form so they stay next to the fields to fix.
     setErrorReason(result.reason);
   }
 

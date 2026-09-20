@@ -58,15 +58,8 @@ async function firstServiceIdInOrganization(
   return response.data[0]?.id ?? null;
 }
 
-// The live API requires a `service` relationship on POST /time_entries and
-// validates the person is allowed to track time on it — despite the
-// assignment stating other TimeEntry relations are irrelevant (see
-// docs/adr/0009-default-service-resolution.md). Since the assignment also
-// puts service/task selection out of scope for the UI, we resolve one
-// automatically rather than asking the user to pick: reuse a service this
-// person has already tracked time on (strongest signal — proven to work),
-// else one they're explicitly assigned to, else fall back to any service in
-// the organization (for a brand new account with neither yet).
+// POST /time_entries requires a service. Pick one automatically: already
+// used, then assigned, then any in the org.
 export async function resolveDefaultServiceId(
   credentials: ApiCredentials,
   personId: string,

@@ -13,8 +13,6 @@ import {
 const DATE_KEY_FORMAT = "yyyy-MM-dd";
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-// The API's own date format (YYYY-MM-DD) — used as the canonical key for
-// comparing/grouping entries by day everywhere in the app.
 export function toDateKey(date: Date): string {
   return format(date, DATE_KEY_FORMAT);
 }
@@ -23,9 +21,7 @@ export function fromDateKey(key: string): Date {
   return parseISO(key);
 }
 
-// Guards the `/day/:date` route param — parseISO doesn't reject malformed
-// input, it just returns an Invalid Date, so a bad URL (typo, garbage,
-// missing param) needs to be caught before it reaches the rest of the page.
+// parseISO accepts malformed input as Invalid Date.
 export function isValidDateKey(key: string | undefined): key is string {
   return (
     key !== undefined && DATE_KEY_PATTERN.test(key) && isValid(parseISO(key))
@@ -36,7 +32,6 @@ export function addDays(date: Date, amount: number): Date {
   return addDaysFns(date, amount);
 }
 
-// Monday-Sunday week containing `date`, per docs/adr/0006-week-strip-in-day-view.md.
 export function getWeekStart(date: Date): Date {
   return startOfWeek(date, { weekStartsOn: 1 });
 }

@@ -7,12 +7,8 @@ type NumberInputProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
 };
 
-// For values that read as numeric/code but aren't a plain number input —
-// e.g. the flexible duration field (docs/adr/0005-flexible-duration-field.md
-// accepts `1:30`, `1.5`, `90m`, none of which fit <input type="number">).
-// Always monospace, per docs/tech-stack.md's font rule for numeric values.
-// Separate from TextField (see docs/tech-stack.md's "Notes on placement")
-// since it also owns rendering its own validation error inline.
+// Text input for numeric-looking values that aren't a plain number
+// (e.g. 1:30, 1.5h).
 export function NumberInput({
   label,
   error,
