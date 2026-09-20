@@ -2,7 +2,8 @@ import clsx from "clsx";
 import type { ButtonHTMLAttributes } from "react";
 import styles from "./Button.module.scss";
 
-type ButtonVariant = "primary" | "accent" | "secondary" | "ghost" | "icon";
+type ButtonVariant =
+  "primary" | "accent" | "secondary" | "ghost" | "icon" | "danger";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;

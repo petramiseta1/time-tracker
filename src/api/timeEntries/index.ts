@@ -1,5 +1,6 @@
 export {
   createTimeEntry,
+  deleteTimeEntry,
   fetchTimeEntriesForRange,
   fetchTimeEntry,
   updateTimeEntry,
@@ -11,6 +12,7 @@ export type {
 } from "./timeEntries";
 export {
   useCreateTimeEntry,
+  useDeleteTimeEntry,
   useTimeEntry,
   useUpdateTimeEntry,
   useWeekTimeEntries,

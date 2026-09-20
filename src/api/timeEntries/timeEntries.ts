@@ -130,6 +130,15 @@ export async function updateTimeEntry(
   return mapTimeEntry(response.data);
 }
 
+export async function deleteTimeEntry(
+  credentials: ApiCredentials,
+  id: string,
+): Promise<void> {
+  await apiRequest<undefined>(`time_entries/${id}`, credentials, {
+    method: "DELETE",
+  });
+}
+
 // One request per week range (see docs/adr/0006-week-strip-in-day-view.md) —
 // the day view's own list and the week strip's per-day totals are both
 // derived client-side from this same result, rather than fetching per day.

@@ -8,6 +8,7 @@ import type { Session } from "../../context/AuthContext";
 import { getWeekEnd, getWeekStart, toDateKey } from "../../utils/date";
 import {
   createTimeEntry,
+  deleteTimeEntry,
   fetchTimeEntriesForRange,
   fetchTimeEntry,
   updateTimeEntry,
@@ -140,6 +141,28 @@ export function useUpdateTimeEntry(session: Session | null) {
         ["timeEntries", "detail", updatedEntry.id],
         updatedEntry,
       );
+    },
+  });
+}
+
+// Same mutation-driven invalidation as the other time entry mutations, plus
+// dropping the detail cache entry so a stale copy can't resurface (e.g. via
+// EntryDeepLink) after the entry no longer exists.
+export function useDeleteTimeEntry(session: Session | null) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => {
+      if (!session) {
+        throw new Error("useDeleteTimeEntry called without a session");
+      }
+      return deleteTimeEntry(session, id);
+    },
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["timeEntries", "week", session?.personId ?? null],
+      });
+      queryClient.removeQueries({ queryKey: ["timeEntries", "detail", id] });
     },
   });
 }
