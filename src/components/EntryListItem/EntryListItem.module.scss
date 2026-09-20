@@ -88,10 +88,52 @@
 .description {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
   font-size: 0.875rem;
   line-height: 1.6;
   color: var(--color-text);
+}
+
+.text {
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   white-space: pre-line;
+}
+
+// 3 lines is the scan-friendly cap for a day's list. `max-height` is what
+// the overflow measure compares against; line-clamp adds the ellipsis.
+// Keep the 3 in both declarations in sync.
+.clamped {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  max-height: calc(1.6em * 3);
+}
+
+.showMore {
+  margin: 0;
+  padding: var(--space-1) 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-accent-text);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-accent-strong);
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: var(--space-2) 0;
+  }
 }
 
 .actions {

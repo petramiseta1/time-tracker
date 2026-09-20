@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import type { TimeEntry } from "../../api/timeEntries";
@@ -24,7 +24,44 @@ type EntryListItemProps = {
 export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
   const location = useLocation();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
+    useState(false);
+  const descriptionRef = useRef<HTMLDivElement>(null);
   const deleteTitleId = useId();
+  const descriptionId = useId();
+
+  // An edit can replace the note in place (same list row, new text). Drop
+  // the expanded state so a now-short description doesn't keep a stale
+  // "Show less", and so a still-long one remeasures against the clamp.
+  // Compared during render (not via a ref or an effect) so the next paint
+  // is already collapsed — React's "adjusting state when a prop changes"
+  // pattern: https://react.dev/learn/you-might-not-need-an-effect
+  const [prevDescription, setPrevDescription] = useState(entry.description);
+  if (entry.description !== prevDescription) {
+    setPrevDescription(entry.description);
+    setIsDescriptionExpanded(false);
+  }
+
+  // Clamp is CSS-only; the toggle is shown only when the clamped box
+  // actually overflows. Character count is a bad proxy here: `pre-line`
+  // plus wrapping means a short string with many newlines can overflow
+  // while a long one on a wide screen might not.
+  useLayoutEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || isDescriptionExpanded) {
+      return;
+    }
+
+    const measure = () => {
+      setIsDescriptionOverflowing(el.scrollHeight - el.clientHeight > 1);
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isDescriptionExpanded, entry.description]);
 
   const entrySummary = `${formatDuration(entry.minutes)} on ${formatShortDate(
     fromDateKey(entry.date),
@@ -44,7 +81,29 @@ export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
             {formatShortDate(fromDateKey(entry.date))}
           </span>
         </div>
-        <div className={styles.description}>{entry.description}</div>
+        <div className={styles.description}>
+          <div
+            id={descriptionId}
+            ref={descriptionRef}
+            className={clsx(
+              styles.text,
+              !isDescriptionExpanded && styles.clamped,
+            )}
+          >
+            {entry.description}
+          </div>
+          {(isDescriptionOverflowing || isDescriptionExpanded) && (
+            <button
+              type="button"
+              className={styles.showMore}
+              aria-expanded={isDescriptionExpanded}
+              aria-controls={descriptionId}
+              onClick={() => setIsDescriptionExpanded((open) => !open)}
+            >
+              {isDescriptionExpanded ? "Show less" : "Show more"}
+            </button>
+          )}
+        </div>
         <div className={styles.actions}>
           <Link
             to={`/entries/${entry.id}`}
