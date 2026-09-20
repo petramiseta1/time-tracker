@@ -7,6 +7,20 @@
   flex-wrap: wrap;
 }
 
+.todayButton {
+  gap: 6px;
+}
+
+// Same pip as the week-strip today marker — pairing them makes the
+// strip's otherwise-ambiguous dot read as "this is today".
+.todayDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
 .dateWrapper {
   position: relative;
 }

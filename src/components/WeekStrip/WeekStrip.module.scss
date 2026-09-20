@@ -16,6 +16,7 @@
   // narrow to fit both side by side well before the page itself hits a
   // "mobile" breakpoint (e.g. a tablet, or a plain narrow window).
   container-type: inline-size;
+  position: relative;
 
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-md);
@@ -92,7 +93,8 @@
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
 
-  .selected & {
+  .selected &,
+  .today & {
     color: var(--color-accent-strong);
   }
 }
@@ -114,12 +116,25 @@
   }
 }
 
+// Sits on the top edge of today's card so it doesn't compete with the
+// weekday/date text, and so the matching pip on the header's Today
+// button can act as a legend for what the marker means.
 .todayDot {
-  width: 5px;
-  height: 5px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-full);
   background: var(--color-accent);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 2px var(--color-background);
   display: block;
+
+  .selected & {
+    box-shadow: 0 0 0 2px var(--color-accent-bg);
+  }
 }
 
 .hours {

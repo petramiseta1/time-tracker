@@ -15,6 +15,8 @@ type DateNavProps = {
 
 export function DateNav({ selectedDate, onSelectDate }: DateNavProps) {
   const pickerRef = useRef<HTMLInputElement>(null);
+  const today = new Date();
+  const todayLabel = `Today, ${formatFullDate(today)}`;
 
   return (
     <div className={styles.nav}>
@@ -58,7 +60,14 @@ export function DateNav({ selectedDate, onSelectDate }: DateNavProps) {
       >
         →
       </Button>
-      <Button variant="secondary" onClick={() => onSelectDate(new Date())}>
+      <Button
+        variant="secondary"
+        className={styles.todayButton}
+        aria-label={todayLabel}
+        title={todayLabel}
+        onClick={() => onSelectDate(today)}
+      >
+        <span className={styles.todayDot} aria-hidden="true" />
         Today
       </Button>
     </div>

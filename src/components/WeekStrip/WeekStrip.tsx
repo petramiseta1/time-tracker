@@ -32,7 +32,9 @@ export function WeekStrip({
         const isOverTarget = minutes > DAILY_TARGET_MINUTES;
         const selected = isSameDay(date, selectedDate);
         const today = isToday(date);
-        const dayDescription = `${formatFullDate(date)}, ${
+        const dayDescription = `${formatFullDate(date)}${
+          today ? ", today" : ""
+        }, ${
           minutes > 0
             ? `${formatHoursDecimal(minutes)} hours logged`
             : "no entries"
@@ -42,13 +44,18 @@ export function WeekStrip({
           <button
             type="button"
             key={dateKey}
-            className={clsx(styles.day, selected && styles.selected)}
+            className={clsx(
+              styles.day,
+              selected && styles.selected,
+              today && styles.today,
+            )}
             onClick={() => onSelectDate(date)}
             aria-pressed={selected}
             aria-current={today ? "date" : undefined}
             aria-label={dayDescription}
             title={dayDescription}
           >
+            {today && <span className={styles.todayDot} aria-hidden="true" />}
             <span className={styles.content}>
               <span className={styles.topRow}>
                 <span className={styles.dateGroup}>
@@ -56,9 +63,6 @@ export function WeekStrip({
                   <span className={styles.dayNumber}>
                     {formatDayOfMonth(date)}
                   </span>
-                  {today && (
-                    <span className={styles.todayDot} aria-hidden="true" />
-                  )}
                 </span>
                 <span
                   className={clsx(
