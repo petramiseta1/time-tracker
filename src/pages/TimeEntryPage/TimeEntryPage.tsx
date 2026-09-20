@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Outlet, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
 import { useWeekTimeEntries } from "../../api/timeEntries";
 import { useAuth } from "../../context/AuthContext";
@@ -174,6 +174,10 @@ export function TimeEntryPage() {
           <EntryForm date={selectedDate} titleId={addEntryTitleId} />
         </Modal>
       )}
+
+      {/* Nested `/day/:date/entries/:id` renders the edit overlay here.
+          Modal portals to document.body, so placement is not visual. */}
+      <Outlet />
     </div>
   );
 }

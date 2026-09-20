@@ -27,7 +27,6 @@
   max-width: 24rem;
   padding: var(--space-3) var(--space-4);
   border: 1px solid transparent;
-  border-left-width: 4px;
   border-radius: var(--radius-md);
   // Tighter than --shadow-dialog so the chip's edge reads on white, not
   // just a large soft glow that disappears against the page.
@@ -47,21 +46,18 @@
   background: var(--color-success-bg);
   color: var(--color-success-text);
   border-color: var(--color-success-border);
-  border-left-color: var(--color-success-text);
 }
 
 .error {
   background: var(--color-danger-border);
   color: var(--color-danger-text-strong);
   border-color: var(--color-danger-border-strong);
-  border-left-color: var(--color-danger-text-strong);
 }
 
 .info {
   background: var(--color-surface);
   color: var(--color-text-secondary);
   border-color: var(--color-border);
-  border-left-color: var(--color-text-muted);
 }
 
 .message {

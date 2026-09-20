@@ -85,9 +85,9 @@ export async function createTimeEntry(
 }
 
 // Single-resource GET, used to resolve an entry directly by id — the edit
-// route (`/entries/:id`, ADR 0004) may be reached with nothing about that
-// entry cached yet (a fresh tab, a direct link, a reload), so it can't rely
-// on the week list already having fetched it.
+// route (`/day/:date/entries/:id`, ADR 0004) may be reached with nothing
+// about that entry cached yet (a fresh tab, a direct link, a reload), so
+// it can't rely on the week list already having fetched it.
 export async function fetchTimeEntry(
   credentials: ApiCredentials,
   id: string,

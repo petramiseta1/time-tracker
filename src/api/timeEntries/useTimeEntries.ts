@@ -168,9 +168,10 @@ function removeEntryFromWeekCaches(
   }
 }
 
-// Backs the edit route (`/entries/:id`, ADR 0004). Falls back to a direct
-// fetch-by-id when the entry isn't in any cached week — the route may be
-// reached with nothing cached yet (a fresh tab, a direct link, a reload).
+// Backs the edit route (`/day/:date/entries/:id`, ADR 0004). Falls back to
+// a direct fetch-by-id when the entry isn't in any cached week — the route
+// may be reached with nothing cached yet (a fresh tab, a direct link, a
+// reload).
 export function useTimeEntry(session: Session | null, id: string | undefined) {
   const queryClient = useQueryClient();
 
@@ -235,8 +236,8 @@ export function useUpdateTimeEntry(session: Session | null) {
 }
 
 // Same direct-write approach as the other time entry mutations, plus
-// dropping the detail cache entry so a stale copy can't resurface (e.g. via
-// EntryDeepLink) after the entry no longer exists.
+// dropping the detail cache entry so a stale copy can't resurface (e.g.
+// reopening the edit overlay) after the entry no longer exists.
 export function useDeleteTimeEntry(session: Session | null) {
   const queryClient = useQueryClient();
 

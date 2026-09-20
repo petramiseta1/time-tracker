@@ -1,5 +1,5 @@
 import { useId, useLayoutEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import clsx from "clsx";
 import type { TimeEntry } from "../../api/timeEntries";
 import { formatShortDate, fromDateKey } from "../../utils/date";
@@ -16,13 +16,12 @@ type EntryListItemProps = {
   removing?: boolean;
 };
 
-// The Edit link carries the current location as `backgroundLocation` state
-// (docs/adr/0004-route-driven-entry-overlay.md), so AppRoutes keeps the day
-// view mounted underneath instead of navigating away from it. Delete has no
-// route of its own (ticket 06) — it's local component state, same as add
-// (docs/adr/0007-add-entry-stays-inline.md), toggling the shared Modal.
+// Edit navigates to the nested `/day/:date/entries/:id` route, which
+// keeps this day view mounted and renders the dialog through TimeEntryPage's
+// <Outlet /> (ADR 0004). Delete has no route of its own (ticket 06) — it's
+// local component state, same as add (docs/adr/0007-add-entry-stays-inline.md),
+// toggling the shared Modal.
 export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
-  const location = useLocation();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isDescriptionOverflowing, setIsDescriptionOverflowing] =
@@ -106,8 +105,7 @@ export function EntryListItem({ entry, removing = false }: EntryListItemProps) {
         </div>
         <div className={styles.actions}>
           <Link
-            to={`/entries/${entry.id}`}
-            state={{ backgroundLocation: location.pathname }}
+            to={`/day/${entry.date}/entries/${entry.id}`}
             className={styles.actionButton}
             aria-label={`Edit entry: ${entrySummary}`}
           >

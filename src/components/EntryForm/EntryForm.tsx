@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useCreateTimeEntry, useUpdateTimeEntry } from "../../api/timeEntries";
@@ -19,17 +20,22 @@ type EntryFormProps = { titleId?: string } & (
   { mode?: "create"; date: Date } | { mode: "edit"; entry: TimeEntry }
 );
 
-// Ticket 04's inline add-entry form, reused as-is by ticket 05's edit popup
-// (mode: "edit") — same fields and validation, plus a date field (add fixes
-// the date to the day view's selected day; edit lets it change, per the
-// assignment's field list). The day view owns whether the add form is shown
-// at all (its "+ Add entry" trigger); add stays an inline action with no
-// dedicated route (docs/adr/0007-add-entry-stays-inline.md), so the day view
-// unmounting this component on close is what resets its fields for next
-// time. Edit's own route/lifecycle is owned by EntryEditOverlay instead.
+// Shared add/edit form: duration, description, and date. Add defaults the
+// date to the day view's selected day; both modes let it change. After a
+// successful save, if the entry's date is no longer the day the page is
+// showing, we navigate there so the user lands on the day they just wrote
+// to instead of a list that no longer contains it.
+//
+// The day view owns whether the add form is shown at all (its "+ Add
+// entry" trigger); add stays an inline action with no dedicated route
+// (docs/adr/0007-add-entry-stays-inline.md), so the day view unmounting
+// this component on close is what resets its fields for next time. Edit's
+// own route/lifecycle is owned by EntryEditOverlay instead.
 export function EntryForm(props: EntryFormProps) {
   const { titleId } = props;
   const onClose = useModalClose();
+  const navigate = useNavigate();
+  const { date: pageDate } = useParams<{ date: string }>();
   const isEdit = props.mode === "edit";
   const { session } = useAuth();
   const { showToast } = useToast();
@@ -97,7 +103,17 @@ export function EntryForm(props: EntryFormProps) {
         });
         showToast("Entry added.", "success");
       }
-      onClose();
+      if (dateKey !== pageDate) {
+        // Edit's overlay unmounts with the route change, so skip its
+        // onClose (which would navigate back to the old day). Add is
+        // local state on the day view, so it still needs a close.
+        navigate(`/day/${dateKey}`, { replace: isEdit });
+        if (!isEdit) {
+          onClose();
+        }
+      } else {
+        onClose();
+      }
     } catch {
       // Form stays open with the entered values so the user can retry
       // without re-typing — nothing changed in the list.
@@ -127,14 +143,12 @@ export function EntryForm(props: EntryFormProps) {
         </button>
       </div>
 
-      {isEdit && (
-        <TextField
-          label="Date"
-          type="date"
-          value={dateKey}
-          onChange={(event) => setDateKey(event.target.value)}
-        />
-      )}
+      <TextField
+        label="Date"
+        type="date"
+        value={dateKey}
+        onChange={(event) => setDateKey(event.target.value)}
+      />
 
       <NumberInput
         label="Duration"
