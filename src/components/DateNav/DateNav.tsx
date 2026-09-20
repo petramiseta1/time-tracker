@@ -21,6 +21,7 @@ export function DateNav({ selectedDate, onSelectDate }: DateNavProps) {
       <Button
         variant="icon"
         aria-label="Previous day"
+        title="Previous day"
         onClick={() => onSelectDate(addDays(selectedDate, -1))}
       >
         ←
@@ -30,6 +31,7 @@ export function DateNav({ selectedDate, onSelectDate }: DateNavProps) {
           type="button"
           className={styles.label}
           aria-label={`Jump to date, currently ${formatFullDate(selectedDate)}`}
+          title="Jump to date"
           onClick={() => pickerRef.current?.showPicker?.()}
         >
           {formatFullDate(selectedDate)}
@@ -51,6 +53,7 @@ export function DateNav({ selectedDate, onSelectDate }: DateNavProps) {
       <Button
         variant="icon"
         aria-label="Next day"
+        title="Next day"
         onClick={() => onSelectDate(addDays(selectedDate, 1))}
       >
         →

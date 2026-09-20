@@ -7,7 +7,7 @@ type AvatarProps = {
 
 export function Avatar({ name }: AvatarProps) {
   return (
-    <span className={styles.avatar} aria-label={name}>
+    <span className={styles.avatar} aria-label={name} title={name}>
       {getInitials(name)}
     </span>
   );

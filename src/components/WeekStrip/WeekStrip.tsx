@@ -24,7 +24,7 @@ export function WeekStrip({
   onSelectDate,
 }: WeekStripProps) {
   return (
-    <div className={styles.strip}>
+    <nav className={styles.strip} aria-label="Week">
       {weekDates.map((date) => {
         const dateKey = toDateKey(date);
         const minutes = totalsByDate.get(dateKey) ?? 0;
@@ -32,6 +32,11 @@ export function WeekStrip({
         const isOverTarget = minutes > DAILY_TARGET_MINUTES;
         const selected = isSameDay(date, selectedDate);
         const today = isToday(date);
+        const dayDescription = `${formatFullDate(date)}, ${
+          minutes > 0
+            ? `${formatHoursDecimal(minutes)} hours logged`
+            : "no entries"
+        }`;
 
         return (
           <button
@@ -41,11 +46,8 @@ export function WeekStrip({
             onClick={() => onSelectDate(date)}
             aria-pressed={selected}
             aria-current={today ? "date" : undefined}
-            aria-label={`${formatFullDate(date)}, ${
-              minutes > 0
-                ? `${formatHoursDecimal(minutes)} hours logged`
-                : "no entries"
-            }`}
+            aria-label={dayDescription}
+            title={dayDescription}
           >
             <span className={styles.content}>
               <span className={styles.topRow}>
@@ -54,7 +56,9 @@ export function WeekStrip({
                   <span className={styles.dayNumber}>
                     {formatDayOfMonth(date)}
                   </span>
-                  {today && <span className={styles.todayDot} />}
+                  {today && (
+                    <span className={styles.todayDot} aria-hidden="true" />
+                  )}
                 </span>
                 <span
                   className={clsx(
@@ -65,7 +69,7 @@ export function WeekStrip({
                   {minutes > 0 ? `${formatHoursDecimal(minutes)}h` : "—"}
                 </span>
               </span>
-              <span className={styles.progressTrack}>
+              <span className={styles.progressTrack} aria-hidden="true">
                 <span
                   className={clsx(
                     styles.progressFill,
@@ -78,6 +82,6 @@ export function WeekStrip({
           </button>
         );
       })}
-    </div>
+    </nav>
   );
 }

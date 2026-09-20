@@ -22,6 +22,7 @@ export function NumberInput({
 }: NumberInputProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
 
   return (
     <div className={styles.field}>
@@ -32,10 +33,11 @@ export function NumberInput({
         id={inputId}
         className={clsx(styles.input, className)}
         aria-invalid={error !== undefined}
+        aria-describedby={error ? errorId : undefined}
         {...props}
       />
       {error && (
-        <p className={styles.error} role="alert">
+        <p id={errorId} className={styles.error} role="alert">
           {error}
         </p>
       )}

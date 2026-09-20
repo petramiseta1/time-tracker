@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useId } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTimeEntry } from "../../api/timeEntries";
 import { useAuth } from "../../context/AuthContext";
@@ -21,6 +21,7 @@ export function EntryEditOverlay() {
   const location = useLocation();
   const backgroundLocation = getBackgroundLocation(location);
   const { data: entry, isPending, isError } = useTimeEntry(session, id);
+  const titleId = useId();
 
   const close = useCallback(() => {
     navigate(backgroundLocation ?? "/", { replace: true });
@@ -38,8 +39,8 @@ export function EntryEditOverlay() {
   }
 
   return (
-    <Modal onClose={close}>
-      <EntryForm mode="edit" entry={entry} onClose={close} />
+    <Modal onClose={close} labelledBy={titleId}>
+      <EntryForm mode="edit" entry={entry} onClose={close} titleId={titleId} />
     </Modal>
   );
 }

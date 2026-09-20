@@ -8,7 +8,7 @@ type EmptyStateProps = {
 export function EmptyState({ title, description }: EmptyStateProps) {
   return (
     <div className={styles.container}>
-      <span className={styles.icon} />
+      <span className={styles.icon} aria-hidden="true" />
       <p className={styles.title}>{title}</p>
       {description && <p className={styles.description}>{description}</p>}
     </div>

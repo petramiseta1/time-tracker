@@ -14,7 +14,7 @@ import styles from "./EntryForm.module.scss";
 
 const DURATION_CHIPS = ["15m", "30m", "1h", "2h"];
 
-type EntryFormProps = { onClose: () => void } & (
+type EntryFormProps = { onClose: () => void; titleId?: string } & (
   { mode?: "create"; date: Date } | { mode: "edit"; entry: TimeEntry }
 );
 
@@ -27,7 +27,7 @@ type EntryFormProps = { onClose: () => void } & (
 // unmounting this component on close is what resets its fields for next
 // time. Edit's own route/lifecycle is owned by EntryEditOverlay instead.
 export function EntryForm(props: EntryFormProps) {
-  const { onClose } = props;
+  const { onClose, titleId } = props;
   const isEdit = props.mode === "edit";
   const { session } = useAuth();
   const { showToast } = useToast();
@@ -111,11 +111,14 @@ export function EntryForm(props: EntryFormProps) {
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.header}>
-        <h3 className={styles.title}>{isEdit ? "Edit entry" : "New entry"}</h3>
+        <h3 className={styles.title} id={titleId}>
+          {isEdit ? "Edit entry" : "New entry"}
+        </h3>
         <button
           type="button"
           className={styles.close}
           aria-label="Close"
+          title="Close"
           onClick={onClose}
         >
           ×

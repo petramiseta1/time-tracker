@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { TimeEntry } from "../../api/timeEntries";
 import { formatShortDate, fromDateKey } from "../../utils/date";
@@ -19,6 +19,11 @@ type EntryListItemProps = {
 export function EntryListItem({ entry }: EntryListItemProps) {
   const location = useLocation();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const deleteTitleId = useId();
+
+  const entrySummary = `${formatDuration(entry.minutes)} on ${formatShortDate(
+    fromDateKey(entry.date),
+  )} — ${entry.description}`;
 
   return (
     <li className={styles.item}>
@@ -34,14 +39,14 @@ export function EntryListItem({ entry }: EntryListItemProps) {
           to={`/entries/${entry.id}`}
           state={{ backgroundLocation: location.pathname }}
           className={styles.actionButton}
-          aria-label="Edit entry"
+          aria-label={`Edit entry: ${entrySummary}`}
         >
           Edit
         </Link>
         <button
           type="button"
           className={styles.actionButton}
-          aria-label="Delete entry"
+          aria-label={`Delete entry: ${entrySummary}`}
           onClick={() => setIsConfirmingDelete(true)}
         >
           Delete
@@ -49,10 +54,14 @@ export function EntryListItem({ entry }: EntryListItemProps) {
       </div>
 
       {isConfirmingDelete && (
-        <Modal onClose={() => setIsConfirmingDelete(false)}>
+        <Modal
+          onClose={() => setIsConfirmingDelete(false)}
+          labelledBy={deleteTitleId}
+        >
           <EntryDeleteConfirm
             entry={entry}
             onClose={() => setIsConfirmingDelete(false)}
+            titleId={deleteTitleId}
           />
         </Modal>
       )}

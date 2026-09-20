@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { ApiError } from "../../api/client";
 import { useWeekTimeEntries } from "../../api/timeEntries";
@@ -28,6 +28,7 @@ export function TimeEntryPage() {
   const navigate = useNavigate();
   const { date: dateParam } = useParams<{ date: string }>();
   const [isAddingEntry, setIsAddingEntry] = useState(false);
+  const addEntryTitleId = useId();
 
   // Hooks below must run unconditionally even for a bad param (a malformed
   // `/day/:date` — a typo, garbage, or a leap-day rollover) — the fallback
@@ -166,10 +167,14 @@ export function TimeEntryPage() {
       </main>
 
       {isAddingEntry && (
-        <Modal onClose={() => setIsAddingEntry(false)}>
+        <Modal
+          onClose={() => setIsAddingEntry(false)}
+          labelledBy={addEntryTitleId}
+        >
           <EntryForm
             date={selectedDate}
             onClose={() => setIsAddingEntry(false)}
+            titleId={addEntryTitleId}
           />
         </Modal>
       )}

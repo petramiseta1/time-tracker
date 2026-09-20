@@ -19,6 +19,7 @@ export function TextArea({
 }: TextAreaProps) {
   const generatedId = useId();
   const textareaId = id ?? generatedId;
+  const errorId = `${textareaId}-error`;
 
   return (
     <div className={styles.field}>
@@ -29,10 +30,11 @@ export function TextArea({
         id={textareaId}
         className={clsx(styles.textarea, className)}
         aria-invalid={error !== undefined}
+        aria-describedby={error ? errorId : undefined}
         {...props}
       />
       {error && (
-        <p className={styles.error} role="alert">
+        <p id={errorId} className={styles.error} role="alert">
           {error}
         </p>
       )}

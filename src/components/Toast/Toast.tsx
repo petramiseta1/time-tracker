@@ -17,7 +17,8 @@ export function ToastStack() {
           <button
             type="button"
             className={styles.dismiss}
-            aria-label="Dismiss"
+            aria-label={`Dismiss: ${toast.message}`}
+            title="Dismiss"
             onClick={() => dismissToast(toast.id)}
           >
             ×

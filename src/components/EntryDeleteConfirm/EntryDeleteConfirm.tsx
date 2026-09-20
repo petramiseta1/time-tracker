@@ -10,6 +10,7 @@ import styles from "./EntryDeleteConfirm.module.scss";
 type EntryDeleteConfirmProps = {
   entry: TimeEntry;
   onClose: () => void;
+  titleId?: string;
 };
 
 // Confirmation content for ticket 06 — rendered inside the shared Modal,
@@ -19,6 +20,7 @@ type EntryDeleteConfirmProps = {
 export function EntryDeleteConfirm({
   entry,
   onClose,
+  titleId,
 }: EntryDeleteConfirmProps) {
   const { session } = useAuth();
   const { showToast } = useToast();
@@ -39,7 +41,9 @@ export function EntryDeleteConfirm({
 
   return (
     <div className={styles.dialog}>
-      <h3 className={styles.title}>Delete this entry?</h3>
+      <h3 className={styles.title} id={titleId}>
+        Delete this entry?
+      </h3>
       <p className={styles.description}>
         {formatDuration(entry.minutes)} on{" "}
         {formatShortDate(fromDateKey(entry.date))} — “{entry.description}”. This

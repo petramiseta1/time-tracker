@@ -15,8 +15,11 @@
   // Text
   --color-text: #191817;
   --color-text-secondary: #55514e;
-  --color-text-muted: #7c7773;
-  --color-text-faint: #a8a29d;
+  // Darkened from the original design's #7c7773/#a8a29d to clear WCAG AA
+  // (4.5:1) for normal-size text — both were failing at their original
+  // shades (4.43:1 and 2.52:1 on white respectively).
+  --color-text-muted: #797471;
+  --color-text-faint: #7b736d;
 
   // Borders
   --color-border: #e9e6e2;
@@ -33,7 +36,9 @@
   --color-accent-text: #8f3a50;
 
   // Danger (errors, delete)
-  --color-danger-text: #c25a74;
+  // Darkened from the original design's #c25a74 (4.19:1 on white) to clear
+  // WCAG AA — this is used for inline validation error text.
+  --color-danger-text: #be506c;
   --color-danger-text-strong: #9e4a60;
   --color-danger-bg: #fdf2f4;
   --color-danger-border: #f3d9df;
