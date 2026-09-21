@@ -149,11 +149,11 @@ A 401 means the token is wrong; an empty result or a 403/404 means the Organizat
 
 **Patching the cache instead of invalidating it.** Keeps saves feeling instant. _Trade-off:_ the patching logic, including moving an entry between weeks, is code we own and have to keep correct.
 
-**SCSS Modules over Tailwind.** Scoped, plain CSS with design tokens, no utility-class vocabulary to adopt. _Trade-off:_ more lines of CSS than utility classes would need.
+**SCSS Modules over a CSS framework.** Scoped, plain CSS with design tokens, no utility-class vocabulary or config to adopt. _Trade-off:_ more lines of CSS than a utility-class framework would need.
 
 **Context over a state library.** Only two pieces of client-only global state exist — Zustand or Redux would be a dependency doing very little.
 
-**No automated tests.** The 10-hour budget went to features, this specification, and UI polish; verification was manual against each user story. _Trade-off:_ regressions aren't caught automatically. The natural seam for future tests is the API mapping layer.
+**Not everything is covered by tests.** Vitest covers the pure utility functions (`duration`, `date`, `html`, `initials` in `src/utils`) and one component (`WeekStrip`), run with `pnpm test`. Most of the 10-hour budget went to features, this specification, and UI polish, so the rest of the components, hooks, and the API mapping layer are still verified manually against each user story. _Trade-off:_ regressions in those areas aren't caught automatically. The natural next seam is the API mapping layer.
 
 ---
 
@@ -168,17 +168,3 @@ Where the assignment was ambiguous, these are the calls made.
 **The week runs Monday to Sunday**, and the daily target is 8 hours — neither specified by the assignment, both conventions from the design.
 
 **Duration is entered in one flexible field.** The assignment just says "the amount of time worked (in minutes)"; a field accepting `1:30`, `1.5`, or `90m` is friendlier than raw minutes, and still sends minutes.
-
----
-
-## 7. Known limitations
-
-**The API token sits in** `localStorage`, readable by any script or anyone with devtools access. This follows directly from the "no server-side technology" constraint — with a backend, the token would stay server-side. `sessionStorage` or in-memory storage would be no safer against the same attacker, and would break the required "refresh keeps you logged in" behaviour.
-
-**CORS support is undocumented.** Requests from a browser to `api.productive.io` work today, but Productive doesn't guarantee this, so a future change on their side could break a browser-only client.
-
-**No pagination in the UI.** One week's entries are fetched in full. Fine for a single person's week; would need rethinking for much larger ranges.
-
-**No client-side 24-hour validation.** The application does not prevent a day's entries from exceeding 24 hours. This validation is left to the API rather than being duplicated in the client.
-
-**Dates before the person's registration date are not restricted by the date picker.** Selecting such a date allows the add-entry form to be opened, but the API rejects the request. The date picker could be further constrained if the person's registration date were available to the client.

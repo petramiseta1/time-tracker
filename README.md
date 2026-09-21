@@ -38,6 +38,7 @@ Open it in a browser and sign in with your API token and Organization ID.
 | `pnpm build`        | Produces a production build in `dist/`                                              |
 | `pnpm preview`      | Serves the production build in `dist/` locally, to sanity-check it before deploying |
 | `pnpm typecheck`    | Type-checks without emitting or building                                            |
+| `pnpm test`         | Runs the test suite (Vitest)                                                        |
 | `pnpm lint`         | Runs ESLint                                                                         |
 | `pnpm lint:fix`     | Runs ESLint with `--fix`                                                            |
 | `pnpm format`       | Formats the codebase with Prettier                                                  |
